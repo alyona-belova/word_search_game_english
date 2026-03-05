@@ -73,6 +73,10 @@ class WordSearchGame {
     this.setupEventListeners();
   }
 
+  updateGridSizeVariable() {
+    document.documentElement.style.setProperty('--grid-size', this.gridSize);
+  }
+
   setupEventListeners() {
     document.addEventListener("mouseup", () => this.stopSelection());
     document
@@ -101,6 +105,7 @@ class WordSearchGame {
 
     this.updateThemeDisplay(theme);
     this.generateGrid();
+    this.updateGridSizeVariable();
     this.render();
 
     if (index === 0 && !this.demoWordShown) {
