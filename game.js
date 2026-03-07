@@ -76,7 +76,11 @@ class WordSearchGame {
     try {
       const progress = {
         currentLevel: this.currentLevel,
+        grid: this.grid,
+        words: this.words,
+        foundWords: Array.from(this.foundWords),
       };
+
       localStorage.setItem("wordSearchProgress", JSON.stringify(progress));
     } catch (e) {
       console.error("Ошибка сохранения:", e);
@@ -85,13 +89,21 @@ class WordSearchGame {
 
   loadProgress() {
     const saved = localStorage.getItem("wordSearchProgress");
-    if (saved) {
-      try {
-        const progress = JSON.parse(saved);
-        this.currentLevel = progress.currentLevel || 1;
-      } catch (e) {
-        console.error("Ошибка загрузки прогресса:", e);
+    if (!saved) return;
+
+    try {
+      const progress = JSON.parse(saved);
+      this.currentLevel = progress.currentLevel || 1;
+
+      if (progress.grid && progress.words) {
+        this.grid = progress.grid;
+        this.words = progress.words;
+        this.foundWords = new Set(progress.foundWords || []);
+        this.rebuildPlacements();
+        this.render();
       }
+    } catch (e) {
+      console.error("Ошибка загрузки прогресса:", e);
     }
   }
 
@@ -121,11 +133,24 @@ class WordSearchGame {
     );
 
     if (wordsWithLetter.length < 8) {
-      return this.loadLevel();
+      return this.loadLevel(Math.random());
     }
 
-    const shuffled = [...wordsWithLetter].sort(() => Math.random() - 0.5);
-    this.words = shuffled.slice(0, 8).sort((a, b) => b.length - a.length);
+    const short = wordsWithLetter.filter((w) => w.length >= 4 && w.length <= 5);
+    const medium = wordsWithLetter.filter(
+      (w) => w.length >= 6 && w.length <= 7,
+    );
+    const long = wordsWithLetter.filter((w) => w.length >= 8);
+
+    function pickRandom(arr, count) {
+      return [...arr].sort(() => Math.random() - 0.5).slice(0, count);
+    }
+
+    this.words = [
+      ...pickRandom(short, 2),
+      ...pickRandom(medium, 3),
+      ...pickRandom(long, 3),
+    ].sort((a, b) => b.length - a.length);
 
     this.foundWords.clear();
     this.selectedCells.clear();
@@ -142,6 +167,35 @@ class WordSearchGame {
     }
 
     document.getElementById("levelCompleteMessage").style.display = "none";
+  }
+
+  rebuildPlacements() {
+    this.placements.clear();
+    for (let word of this.words) {
+      for (let i = 0; i < this.gridSize; i++) {
+        for (let j = 0; j < this.gridSize; j++) {
+          if (this.grid[i][j] === word[0]) {
+            const right = this.checkWordAt(word, i, j, 0, 1);
+            const down = this.checkWordAt(word, i, j, 1, 0);
+            if (right)
+              this.commitPlacement(word, { row: i, col: j, direction: [0, 1] });
+            if (down)
+              this.commitPlacement(word, { row: i, col: j, direction: [1, 0] });
+          }
+        }
+      }
+    }
+  }
+
+  checkWordAt(word, row, col, dr, dc) {
+    for (let i = 0; i < word.length; i++) {
+      const r = row + dr * i;
+      const c = col + dc * i;
+
+      if (r >= this.gridSize || c >= this.gridSize) return false;
+      if (this.grid[r][c] !== word[i]) return false;
+    }
+    return true;
   }
 
   autoFindDemoWord() {
@@ -213,8 +267,8 @@ class WordSearchGame {
         return false;
       }
 
-      if (this.grid[row][col] !== null) {
-        return false; // no overlapping allowed
+      if (this.grid[row][col] !== null && this.grid[row][col] !== word[i]) {
+        return false;
       }
     }
 
@@ -275,7 +329,9 @@ class WordSearchGame {
     const key = `${row},${col}`;
     if (!this.selectedCells.has(key)) {
       this.selectedCells.add(key);
-      this.render();
+      const gridEl = document.getElementById("grid");
+      const index = row * this.gridSize + col;
+      gridEl.children[index].classList.add("selected");
     }
   }
 

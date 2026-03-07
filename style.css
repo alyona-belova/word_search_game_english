@@ -326,6 +326,7 @@ body {
     border-radius: 6px;
     border-width: 1.5px;
     box-sizing: border-box;
+    touch-action: none;
   }
 
   .words-progress {
