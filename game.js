@@ -61,6 +61,7 @@ class WordSearchGame {
     this.gridSize = 12;
     this.placements = new Map();
     this.demoWordShown = false;
+    this.levelName = "";
 
     this.init();
   }
@@ -81,6 +82,7 @@ class WordSearchGame {
         grid: this.grid,
         words: this.words,
         foundWords: Array.from(this.foundWords),
+        levelName: this.levelName,
       };
 
       localStorage.setItem("wordSearchProgress", JSON.stringify(progress));
@@ -100,7 +102,9 @@ class WordSearchGame {
       if (progress.grid && progress.words) {
         this.grid = progress.grid;
         this.words = progress.words;
+        this.levelName = progress.levelName || "";
         this.foundWords = new Set(progress.foundWords || []);
+        this.updateThemeDisplay({ name: this.levelName });
         this.rebuildPlacements();
         this.render();
         return true;
@@ -161,7 +165,8 @@ class WordSearchGame {
     this.selectedCells.clear();
     this.placements.clear();
 
-    this.updateThemeDisplay({ name: `Буква "${randomLetter}"` });
+    this.levelName = `Буква "${randomLetter}"`;
+    this.updateThemeDisplay({ name: this.levelName });
     this.generateGrid();
     this.updateGridSizeVariable();
     this.render();
