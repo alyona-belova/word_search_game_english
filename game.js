@@ -175,7 +175,9 @@ class WordSearchGame {
 
   loadLevel(attempt = 0) {
     if (attempt > 50) {
-      console.error("Не удалось подобрать букву с достаточным количеством слов");
+      console.error(
+        "Не удалось подобрать букву с достаточным количеством слов",
+      );
       return;
     }
 
@@ -491,7 +493,10 @@ class WordSearchGame {
           this.hintsUsed++;
           const hintWord = this.giveHint();
           this.saveProgress();
-          this.showMessage(`Подсказка: ищи слово "${hintWord}"`, "level-complete");
+          this.showMessage(
+            `Подсказка: ищи слово "${hintWord}"`,
+            "level-complete",
+          );
         } else {
           this.saveProgress();
           this.showMessage("Слово из другого уровня!", "success");
@@ -549,13 +554,13 @@ class WordSearchGame {
   levelComplete() {
     let message = "";
     if (this.hintsUsed === 0) {
-      message = "😻 Отлично! Без подсказок!";
+      message = "Отлично! Без подсказок 😻";
     } else if (this.hintsUsed === 1) {
-      message = "🙀 Ого! Всего одна подсказка!";
+      message = "Ого! Всего одна подсказка 🙀";
     } else if (this.hintsUsed === 2) {
-      message = "😼 Неплохо! Две подсказки.";
+      message = "Две подсказки? Неплохо 😼";
     } else {
-      message = "😿 Сложный уровень? Не сдавайся!";
+      message = "Сложный уровень? 😿 Не сдавайся!";
     }
 
     const confettiDiv = document.querySelector(
