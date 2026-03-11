@@ -159,6 +159,11 @@ body {
   opacity: 0.9;
 }
 
+.grid-cell.hint {
+  background: var(--blue-color);
+  border-color: var(--blue-dark-color);
+}
+
 .grid-cell:active:not(.found) {
   transform: scale(0.95);
 }

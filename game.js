@@ -62,6 +62,9 @@ class WordSearchGame {
     this.placements = new Map();
     this.demoWordShown = false;
     this.levelName = "";
+    this.themeLetter = ''; 
+    this.extraWords = [];
+    this.hintsUsed = 0;  
 
     this.init();
   }
@@ -83,6 +86,9 @@ class WordSearchGame {
         words: this.words,
         foundWords: Array.from(this.foundWords),
         levelName: this.levelName,
+        hintsUsed: this.hintsUsed,
+        extraWords: this.extraWords,
+        themeLetter: this.themeLetter,
       };
 
       localStorage.setItem("wordSearchProgress", JSON.stringify(progress));
@@ -104,6 +110,9 @@ class WordSearchGame {
         this.words = progress.words;
         this.levelName = progress.levelName || "";
         this.foundWords = new Set(progress.foundWords || []);
+        this.hintsUsed = progress.hintsUsed || 0;
+        this.extraWords = progress.extraWords || [];
+        this.themeLetter = progress.themeLetter || '';
         this.updateThemeDisplay({ name: this.levelName });
         this.rebuildPlacements();
         this.render();
@@ -146,6 +155,9 @@ class WordSearchGame {
       (word) => word.includes(randomLetter) && word.length <= this.gridSize - 1,
     );
 
+    this.themeLetter = randomLetter;
+    this.hintsUsed = 0;
+
     if (wordsWithLetter.length < 8) {
       return this.loadLevel(Math.random());
     }
@@ -186,7 +198,8 @@ class WordSearchGame {
 
   rebuildPlacements() {
     this.placements.clear();
-    for (let word of this.words) {
+    const allPlacedWords = [...this.words, ...this.extraWords];
+    for (let word of allPlacedWords) {
       for (let i = 0; i < this.gridSize; i++) {
         for (let j = 0; j < this.gridSize; j++) {
           if (this.grid[i][j] === word[0]) {
@@ -242,6 +255,7 @@ class WordSearchGame {
       this.placeWord(word);
     }
 
+    placeExtraWords()
     this.fillEmptyCells();
   }
 
@@ -264,13 +278,32 @@ class WordSearchGame {
     }
 
     if (validPlacements.length === 0) {
-      throw new Error(`Cannot place word: ${word}`);
+      return false;
     }
 
     const choice =
       validPlacements[Math.floor(Math.random() * validPlacements.length)];
 
     this.commitPlacement(word, choice);
+    return true;
+  }
+
+  placeExtraWords() {
+    const candidates = allWords.filter(word => 
+      !word.includes(this.themeLetter) && 
+      !this.words.includes(word) && 
+      word.length <= this.gridSize
+    );
+
+    const shuffled = [...candidates].sort(() => Math.random() - 0.5);
+    let placed = 0;
+    for (let word of shuffled) {
+      if (placed >= 10) break; // limit extra words
+      if (this.placeWord(word)) {
+        this.extraWords.push(word);
+        placed++;
+      }
+    }
   }
 
   canPlaceWord(word, startRow, startCol, direction) {
@@ -400,11 +433,46 @@ class WordSearchGame {
         this.levelComplete();
       }
     } else {
-      this.showMessage("Данного слова нет в текущей теме", "error");
+      const wordInAll = allWords.find(w => w === selectedWord || w === reversedWord);
+      if (wordInAll && !this.foundWords.has(wordInAll) && !this.extraWords.includes(wordInAll)) {
+        this.hintsUsed++;
+        this.saveProgress();
+        this.giveHint();
+        this.showMessage("Слово из другого уровня!", "success");
+      } else {
+        this.showMessage("Данного слова нет в текущем словаре", "error");
+  }
     }
 
     this.selectedCells.clear();
     this.render();
+  }
+
+  giveHint() {
+    const unfound = this.words.filter(word => !this.foundWords.has(word));
+    if (unfound.length === 0) return;
+    const hintWord = unfound[Math.floor(Math.random() * unfound.length)];
+
+    const cells = [];
+    for (let [key, words] of this.placements.entries()) {
+      if (words.has(hintWord)) {
+        cells.push(key);
+      }
+    }
+
+    cells.forEach(key => {
+      const [r, c] = key.split(',').map(Number);
+      const index = r * this.gridSize + c;
+      const cell = document.getElementById('grid')?.children[index];
+      if (cell) {
+        cell.classList.add('hint');
+        setTimeout(() => {
+          cell.classList.remove('hint');
+        }, 1500);
+      }
+    });
+
+    this.showMessage(`Подсказка: ищи слово "${hintWord}"`, 'level-complete');
   }
 
   checkStraightLine(cells) {
@@ -430,15 +498,24 @@ class WordSearchGame {
   }
 
   levelComplete() {
+    let message = '😼 Уровень пройден!';
+    if (this.hintsUsed === 0) {
+      message = '😻 Отлично! Без подсказок!';
+    } else if (this.hintsUsed === 1) {
+      message = '🙀 Ого! Всего одна подсказка!';
+    } else if (this.hintsUsed === 2) {
+      message = '😼 Неплохо! Две подсказки.';
+    } else {
+      message = '😿 Сложный уровень? Не сдавайся!';
+    }
+
+    const confettiDiv = document.querySelector('#levelCompleteMessage .confetti');
+    confettiDiv.textContent = message;
+
     document.getElementById("levelCompleteMessage").style.display = "block";
 
     this.currentLevel++;
     this.saveProgress();
-  }
-
-  nextLevel() {
-    this.saveProgress();
-    this.loadLevel();
   }
 
   showMessage(text, type) {
@@ -510,7 +587,7 @@ class WordSearchGame {
     const foundArray = Array.from(this.foundWords);
 
     if (foundArray.length === 0) {
-      container.innerHTML = "";
+      container.innerHTML = '<div class="empty-words">Пока ничего не найдено</div>';
       return;
     }
 
