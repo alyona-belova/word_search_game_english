@@ -255,7 +255,7 @@ class WordSearchGame {
       this.placeWord(word);
     }
 
-    placeExtraWords()
+    this.placeExtraWords();
     this.fillEmptyCells();
   }
 
