@@ -498,7 +498,7 @@ class WordSearchGame {
   }
 
   levelComplete() {
-    let message = '😼 Уровень пройден!';
+    let message = "";
     if (this.hintsUsed === 0) {
       message = '😻 Отлично! Без подсказок!';
     } else if (this.hintsUsed === 1) {

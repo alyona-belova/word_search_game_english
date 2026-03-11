@@ -328,21 +328,8 @@ body {
 }
 
 .confetti {
-  font-size: 3rem;
+  font-size: 1rem;
   margin-bottom: 8px;
-  animation: bounce 1s infinite;
-}
-
-@keyframes bounce {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-8px);
-  }
 }
 
 .complete-title {
