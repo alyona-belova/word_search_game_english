@@ -16,11 +16,11 @@
   --main-dark-color: #ff7575;
   --secondary-color: #b7a3e3;
   --secondary-dark-color: #9b87d1;
-  --ink-color: #1a1208;
+  --ink-color: #3d2e1a;
   --paper-color: #fffdf5;
   --grey-color: #e8dfc8;
   --light-grey-color: #fff8e8;
-  --dark-grey-color: #6b5c3e;
+  --dark-grey-color: #8a7455;
   --shadow-sm: 0 2px 8px rgba(26, 18, 8, 0.08);
   --shadow-md: 0 4px 20px rgba(26, 18, 8, 0.12);
   --radius: 2px;
@@ -54,7 +54,7 @@ body {
   border-radius: 0;
   box-shadow: var(--shadow-md), 4px 4px 0 rgba(26, 18, 8, 0.15);
   overflow: hidden;
-  border: 2px solid var(--ink-color);
+  border: 2px solid var(--grey-color);
 }
 
 /* ── MASTHEAD ── */
@@ -63,7 +63,7 @@ body {
   padding: 0;
   text-align: center;
   position: relative;
-  border-bottom: 3px double var(--ink-color);
+  border-bottom: 3px double var(--grey-color);
 }
 
 .header::before {
@@ -123,12 +123,12 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 8px 20px;
-  background: var(--ink-color);
+  background: var(--secondary-color);
   border-bottom: none;
 }
 
 .theme-badge {
-  background: var(--main-color);
+  background: var(--paper-color);
   color: var(--ink-color);
   padding: 3px 14px;
   border-radius: 0;
@@ -141,7 +141,7 @@ body {
 
 .level-progress {
   font-size: 0.75rem;
-  color: var(--bg-color);
+  color: var(--ink-color);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -159,9 +159,9 @@ body {
 .grid-wrapper {
   background: var(--light-grey-color);
   padding: 12px;
-  border: 1.5px solid var(--ink-color);
+  border: 1.5px solid var(--grey-color);
   border-radius: 0;
-  box-shadow: 3px 3px 0 rgba(26, 18, 8, 0.12);
+  box-shadow: 3px 3px 0 rgba(26, 18, 8, 0.08);
   margin-bottom: 20px;
   width: fit-content;
   position: relative;
@@ -239,11 +239,11 @@ body {
 .words-progress {
   width: 100%;
   background: var(--paper-color);
-  border: 1.5px solid var(--ink-color);
+  border: 1.5px solid var(--grey-color);
   border-radius: 0;
   padding: 16px;
   margin-bottom: 14px;
-  box-shadow: 2px 2px 0 rgba(26, 18, 8, 0.1);
+  box-shadow: 2px 2px 0 rgba(26, 18, 8, 0.06);
 }
 
 .progress-header {
@@ -251,7 +251,7 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
-  border-bottom: 2px solid var(--ink-color);
+  border-bottom: 2px solid var(--grey-color);
   padding-bottom: 8px;
 }
 
@@ -334,7 +334,7 @@ body {
 .found-word-badge {
   padding: 4px 12px;
   background: var(--light-grey-color);
-  border: 1.5px solid var(--ink-color);
+  border: 1.5px solid var(--grey-color);
   border-radius: 0;
   font-size: 0.8rem;
   font-weight: 700;
@@ -354,7 +354,7 @@ body {
   height: 100%;
   background: var(--main-light-color);
   z-index: -1;
-  border: 1.5px solid var(--ink-color);
+  border: 1.5px solid var(--grey-color);
 }
 
 @keyframes popIn {
@@ -384,7 +384,7 @@ body {
   width: fit-content;
   max-width: 90%;
   color: var(--ink-color);
-  border: 1.5px solid var(--ink-color);
+  border: 1.5px solid var(--grey-color);
 }
 
 @keyframes slideIn {
@@ -419,11 +419,11 @@ body {
   text-align: center;
   padding: 28px 32px;
   margin: 12px 0 6px;
-  border: 2px solid var(--ink-color);
+  border: 1.5px solid var(--grey-color);
   border-top: none;
   border-radius: 0;
   background: var(--paper-color);
-  box-shadow: 4px 4px 0 rgba(26, 18, 8, 0.15);
+  box-shadow: 3px 3px 0 rgba(26, 18, 8, 0.08);
   width: 100%;
   max-width: 420px;
   animation: cardAppear 0.4s ease;
@@ -477,9 +477,9 @@ body {
 }
 
 .next-level-btn {
-  background: var(--ink-color);
-  color: var(--bg-color);
-  border: 2px solid var(--ink-color);
+  background: var(--main-color);
+  color: var(--ink-color);
+  border: 2px solid var(--main-dark-color);
   padding: 11px 28px;
   border-radius: 0;
   font-family: "DM Sans", system-ui, sans-serif;
@@ -496,13 +496,13 @@ body {
   align-items: center;
   gap: 10px;
   margin: 0 auto;
-  box-shadow: 3px 3px 0 var(--main-color);
+  box-shadow: 3px 3px 0 var(--secondary-color);
 }
 
 .next-level-btn:hover {
-  background: var(--main-color);
-  color: var(--ink-color);
-  box-shadow: 3px 3px 0 var(--ink-color);
+  background: var(--main-dark-color);
+  color: var(--paper-color);
+  box-shadow: 3px 3px 0 var(--secondary-dark-color);
   transform: translateY(-1px);
 }
 
@@ -521,8 +521,8 @@ body {
 /* ── FOOTER ── */
 .footer {
   padding: 10px 24px;
-  background: var(--ink-color);
-  border-top: none;
+  background: var(--bg-color);
+  border-top: 2px solid var(--grey-color);
 }
 
 .footer-content {
@@ -530,7 +530,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  color: var(--bg-color);
+  color: var(--dark-grey-color);
   font-size: 0.72rem;
   text-align: center;
   font-weight: 600;
