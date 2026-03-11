@@ -430,7 +430,6 @@ class WordSearchGame {
   }
 
   levelComplete() {
-    this.showMessage("Ура! Уровень пройден!", "level-complete");
     document.getElementById("levelCompleteMessage").style.display = "block";
 
     this.currentLevel++;
