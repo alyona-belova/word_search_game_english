@@ -554,13 +554,13 @@ class WordSearchGame {
   levelComplete() {
     let message = "";
     if (this.hintsUsed === 0) {
-      message = "Отлично! Без подсказок 😻";
+      message = "Без подсказок. Идеально ✨";
     } else if (this.hintsUsed === 1) {
-      message = "Ого! Всего одна подсказка 🙀";
+      message = "Так держать! Всего одна подсказка";
     } else if (this.hintsUsed === 2) {
-      message = "Две подсказки? Неплохо 😼";
+      message = "Две подсказки? Неплохо :)";
     } else {
-      message = "Сложный уровень? 😿 Не сдавайся!";
+      message = "Сложный уровень? Не сдавайся!";
     }
 
     const confettiDiv = document.querySelector(
