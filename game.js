@@ -15,47 +15,12 @@ async function loadWordsFromFile() {
 let allWords = [];
 
 const RUSSIAN_ALPHABET = [
-  "А",
-  "Б",
-  "В",
-  "Г",
-  "Д",
-  "Е",
-  "Ё",
-  "Ж",
-  "З",
-  "И",
-  "Й",
-  "К",
-  "Л",
-  "М",
-  "Н",
-  "О",
-  "П",
-  "Р",
-  "С",
-  "Т",
-  "У",
-  "Ф",
-  "Х",
-  "Ц",
-  "Ч",
-  "Ш",
-  "Щ",
-  "Ъ",
-  "Ы",
-  "Ь",
-  "Э",
-  "Ю",
-  "Я",
+  "А", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "Ь", "Э", "Ю", "Я",
 ];
 
 function removePrefixConflicts(words) {
   return words.filter(
-    (w) =>
-      !words.some(
-        (other) => other !== w && (other.startsWith(w) || w.startsWith(other)),
-      ),
+    (w) => !words.some((other) => other !== w && (other.startsWith(w) || w.startsWith(other))),
   );
 }
 
@@ -65,7 +30,7 @@ class WordSearchGame {
     this.grid = [];
     this.words = [];
     this.foundWords = new Set();
-    this.selectedCells = new Set();
+    this.selectedCells = [];
     this.isSelecting = false;
     this.gridSize = 12;
     this.placements = new Map();
@@ -77,6 +42,7 @@ class WordSearchGame {
     this.hintsUsed = 0;
     this.extraWordsFoundCount = 0;
     this.wordStartCells = new Map();
+    this.wordPaths = new Map();
 
     this.init();
   }
@@ -103,8 +69,8 @@ class WordSearchGame {
         extraWords: this.extraWords,
         foundExtraWords: Array.from(this.foundExtraWords),
         themeLetter: this.themeLetter,
+        wordPaths: Array.from(this.wordPaths.entries()),
       };
-
       localStorage.setItem("wordSearchProgress", JSON.stringify(progress));
     } catch (e) {
       console.error("Ошибка сохранения:", e);
@@ -114,11 +80,9 @@ class WordSearchGame {
   loadProgress() {
     const saved = localStorage.getItem("wordSearchProgress");
     if (!saved) return false;
-
     try {
       const progress = JSON.parse(saved);
       this.currentLevel = progress.currentLevel || 1;
-
       if (progress.grid && progress.words) {
         this.grid = progress.grid;
         this.words = progress.words;
@@ -129,22 +93,22 @@ class WordSearchGame {
         this.extraWords = progress.extraWords || [];
         this.foundExtraWords = new Set(progress.foundExtraWords || []);
         this.themeLetter = progress.themeLetter || "";
+        this.wordPaths = new Map(
+          (progress.wordPaths || []).map(([k, v]) => [k, v])
+        );
         this.updateThemeDisplay({ name: this.levelName });
         this.rebuildPlacements();
         this.render();
         if (this.foundWords.size === this.words.length) {
-          document.getElementById("levelCompleteMessage").style.display =
-            "block";
+          document.getElementById("levelCompleteMessage").style.display = "block";
         } else {
-          document.getElementById("levelCompleteMessage").style.display =
-            "none";
+          document.getElementById("levelCompleteMessage").style.display = "none";
         }
         return true;
       }
     } catch (e) {
       console.error("Ошибка загрузки прогресса:", e);
     }
-
     return false;
   }
 
@@ -161,9 +125,7 @@ class WordSearchGame {
   setupEventListeners() {
     document.addEventListener("mouseup", () => this.stopSelection());
     document.addEventListener("touchend", () => this.stopSelection());
-    document
-      .getElementById("nextLevelBtn")
-      .addEventListener("click", () => this.nextLevel());
+    document.getElementById("nextLevelBtn").addEventListener("click", () => this.nextLevel());
   }
 
   nextLevel() {
@@ -175,9 +137,7 @@ class WordSearchGame {
 
   loadLevel(attempt = 0) {
     if (attempt > 50) {
-      console.error(
-        "Не удалось подобрать букву с достаточным количеством слов",
-      );
+      console.error("Не удалось подобрать букву с достаточным количеством слов");
       return;
     }
 
@@ -186,9 +146,9 @@ class WordSearchGame {
     this.extraWords = [];
     this.foundExtraWords = new Set();
     this.wordStartCells.clear();
+    this.wordPaths.clear();
 
-    const randomLetter =
-      RUSSIAN_ALPHABET[Math.floor(Math.random() * RUSSIAN_ALPHABET.length)];
+    const randomLetter = RUSSIAN_ALPHABET[Math.floor(Math.random() * RUSSIAN_ALPHABET.length)];
     const wordsWithLetter = allWords.filter(
       (word) => word.includes(randomLetter) && word.length <= this.gridSize - 1,
     );
@@ -200,9 +160,7 @@ class WordSearchGame {
     }
 
     const short = wordsWithLetter.filter((w) => w.length >= 4 && w.length <= 5);
-    const medium = wordsWithLetter.filter(
-      (w) => w.length >= 6 && w.length <= 7,
-    );
+    const medium = wordsWithLetter.filter((w) => w.length >= 6 && w.length <= 7);
     const long = wordsWithLetter.filter((w) => w.length >= 8);
 
     function pickRandom(arr, count) {
@@ -215,12 +173,10 @@ class WordSearchGame {
       ...pickRandom(long, 3),
     ];
 
-    this.words = removePrefixConflicts(this.words).sort(
-      (a, b) => b.length - a.length,
-    );
+    this.words = removePrefixConflicts(this.words).sort((a, b) => b.length - a.length);
 
     this.foundWords.clear();
-    this.selectedCells.clear();
+    this.selectedCells = [];
     this.placements.clear();
 
     this.levelName = `Буква "${randomLetter}"`;
@@ -239,33 +195,16 @@ class WordSearchGame {
 
   rebuildPlacements() {
     this.placements.clear();
-    this.wordStartCells.clear();
-    const allPlacedWords = [...this.words, ...this.extraWords];
-    for (let word of allPlacedWords) {
-      for (let i = 0; i < this.gridSize; i++) {
-        for (let j = 0; j < this.gridSize; j++) {
-          if (this.grid[i][j] === word[0]) {
-            const right = this.checkWordAt(word, i, j, 0, 1);
-            const down = this.checkWordAt(word, i, j, 1, 0);
-            if (right)
-              this.commitPlacement(word, { row: i, col: j, direction: [0, 1] });
-            if (down)
-              this.commitPlacement(word, { row: i, col: j, direction: [1, 0] });
-          }
-        }
+    for (const [word, path] of this.wordPaths.entries()) {
+      for (const [r, c] of path) {
+        const key = `${r},${c}`;
+        if (!this.placements.has(key)) this.placements.set(key, new Set());
+        this.placements.get(key).add(word);
+      }
+      if (path.length > 0) {
+        this.wordStartCells.set(word, { row: path[0][0], col: path[0][1] });
       }
     }
-  }
-
-  checkWordAt(word, row, col, dr, dc) {
-    for (let i = 0; i < word.length; i++) {
-      const r = row + dr * i;
-      const c = col + dc * i;
-
-      if (r >= this.gridSize || c >= this.gridSize) return false;
-      if (this.grid[r][c] !== word[i]) return false;
-    }
-    return true;
   }
 
   autoFindDemoWord() {
@@ -273,61 +212,109 @@ class WordSearchGame {
     const randomIndex = Math.floor(Math.random() * this.words.length);
     const demoWord = this.words[randomIndex];
     this.foundWords.add(demoWord);
-
-    this.showMessage(
-      `Слово "${demoWord}" уже найдено — попробуйте найти остальные!`,
-      "level-complete",
-    );
-
+    this.showMessage(`Слово "${demoWord}" уже найдено — попробуйте найти остальные!`, "level-complete");
     this.render();
   }
 
   updateThemeDisplay(theme) {
     document.getElementById("currentTheme").textContent = theme.name;
-    document.getElementById("levelProgress").textContent =
-      `Уровень: ${this.currentLevel}`;
+    document.getElementById("levelProgress").textContent = `Уровень: ${this.currentLevel}`;
   }
 
   generateGrid() {
     this.grid = Array.from({ length: this.gridSize }, () =>
-      Array(this.gridSize).fill(null),
+      Array(this.gridSize).fill(null)
     );
+    this.wordPaths.clear();
+    this.wordStartCells.clear();
 
     for (const word of this.words) {
-      this.placeWord(word);
+      this.placeWordSnaking(word);
     }
-
     this.placeExtraWords();
     this.fillEmptyCells();
   }
 
-  placeWord(word) {
-    const directions = [
-      [0, 1], // right
-      [1, 0], // down
+  placeWordSnaking(word, maxAttempts = 200) {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const startRow = Math.floor(Math.random() * this.gridSize);
+      const startCol = Math.floor(Math.random() * this.gridSize);
+
+      if (this.grid[startRow][startCol] !== null) continue;
+
+      const path = this.buildSnakingPath(word, startRow, startCol);
+      if (path && path.length === word.length) {
+        this.commitSnakingPath(word, path);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  buildSnakingPath(word, startRow, startCol) {
+    const path = [[startRow, startCol]];
+    const visited = new Set([`${startRow},${startCol}`]);
+
+    const dfs = (index) => {
+      if (index === word.length) return true;
+
+      const [r, c] = path[index - 1];
+      const neighbors = this.shuffledNeighbors(r, c);
+
+      for (const [nr, nc] of neighbors) {
+        const key = `${nr},${nc}`;
+        if (visited.has(key)) continue;
+        if (this.grid[nr][nc] !== null) continue;
+
+        path.push([nr, nc]);
+        visited.add(key);
+
+        if (dfs(index + 1)) return true;
+
+        path.pop();
+        visited.delete(key);
+      }
+      return false;
+    };
+
+    if (dfs(1)) return path;
+    return null;
+  }
+
+  shuffledNeighbors(r, c) {
+    const dirs = [
+      [-1, -1], [-1, 0], [-1, 1],
+      [0, -1], [0, 1],
+      [1, -1], [1, 0], [1, 1],
     ];
-
-    const validPlacements = [];
-
-    for (const direction of directions) {
-      for (let row = 0; row < this.gridSize; row++) {
-        for (let col = 0; col < this.gridSize; col++) {
-          if (this.canPlaceWord(word, row, col, direction)) {
-            validPlacements.push({ row, col, direction });
-          }
-        }
+    const result = [];
+    for (const [dr, dc] of dirs) {
+      const nr = r + dr;
+      const nc = c + dc;
+      if (nr >= 0 && nr < this.gridSize && nc >= 0 && nc < this.gridSize) {
+        result.push([nr, nc]);
       }
     }
 
-    if (validPlacements.length === 0) {
-      return false;
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
     }
+    return result;
+  }
 
-    const choice =
-      validPlacements[Math.floor(Math.random() * validPlacements.length)];
+  commitSnakingPath(word, path) {
+    this.wordPaths.set(word, path);
+    this.wordStartCells.set(word, { row: path[0][0], col: path[0][1] });
 
-    this.commitPlacement(word, choice);
-    return true;
+    for (let i = 0; i < path.length; i++) {
+      const [r, c] = path[i];
+      this.grid[r][c] = word[i];
+
+      const key = `${r},${c}`;
+      if (!this.placements.has(key)) this.placements.set(key, new Set());
+      this.placements.get(key).add(word);
+    }
   }
 
   placeExtraWords() {
@@ -342,45 +329,9 @@ class WordSearchGame {
       .slice(0, 80);
 
     for (const word of candidates) {
-      if (this.placeWord(word)) {
+      if (this.placeWordSnaking(word, 50)) {
         this.extraWords.push(word);
       }
-    }
-  }
-
-  canPlaceWord(word, startRow, startCol, direction) {
-    for (let i = 0; i < word.length; i++) {
-      const row = startRow + direction[0] * i;
-      const col = startCol + direction[1] * i;
-
-      if (row < 0 || row >= this.gridSize || col < 0 || col >= this.gridSize) {
-        return false;
-      }
-
-      if (this.grid[row][col] !== null) {
-        return false; // no overlap
-      }
-    }
-
-    return true;
-  }
-
-  commitPlacement(word, { row, col, direction }) {
-    if (!this.wordStartCells.has(word)) {
-      this.wordStartCells.set(word, { row, col });
-    }
-
-    for (let i = 0; i < word.length; i++) {
-      const r = row + direction[0] * i;
-      const c = col + direction[1] * i;
-
-      this.grid[r][c] = word[i];
-
-      const key = `${r},${c}`;
-      if (!this.placements.has(key)) {
-        this.placements.set(key, new Set());
-      }
-      this.placements.get(key).add(word);
     }
   }
 
@@ -388,10 +339,7 @@ class WordSearchGame {
     for (let i = 0; i < this.gridSize; i++) {
       for (let j = 0; j < this.gridSize; j++) {
         if (this.grid[i][j] === null) {
-          this.grid[i][j] =
-            RUSSIAN_ALPHABET[
-              Math.floor(Math.random() * RUSSIAN_ALPHABET.length)
-            ];
+          this.grid[i][j] = RUSSIAN_ALPHABET[Math.floor(Math.random() * RUSSIAN_ALPHABET.length)];
         }
       }
     }
@@ -399,9 +347,8 @@ class WordSearchGame {
 
   startSelection(row, col) {
     if (this.isCellFound(row, col)) return;
-
     this.isSelecting = true;
-    this.selectedCells.clear();
+    this.selectedCells = [];
     this.addToSelection(row, col);
   }
 
@@ -409,7 +356,6 @@ class WordSearchGame {
     const cellKey = `${row},${col}`;
     const wordSet = this.placements.get(cellKey);
     if (!wordSet) return false;
-
     for (let word of wordSet) {
       if (this.foundWords.has(word)) return true;
     }
@@ -421,46 +367,49 @@ class WordSearchGame {
     if (this.isCellFound(row, col)) return;
 
     const key = `${row},${col}`;
-    if (!this.selectedCells.has(key)) {
-      this.selectedCells.add(key);
-      const gridEl = document.getElementById("grid");
-      const index = row * this.gridSize + col;
-      gridEl.children[index].classList.add("selected");
+
+    const existingIdx = this.selectedCells.findIndex(([r, c]) => r === row && c === col);
+    if (existingIdx !== -1) {
+      this.selectedCells = this.selectedCells.slice(0, existingIdx + 1);
+      this.renderSelectionHighlight();
+      return;
+    }
+
+    if (this.selectedCells.length > 0) {
+      const [lastR, lastC] = this.selectedCells[this.selectedCells.length - 1];
+      if (Math.abs(row - lastR) > 1 || Math.abs(col - lastC) > 1) return;
+    }
+
+    this.selectedCells.push([row, col]);
+    this.renderSelectionHighlight();
+  }
+
+  renderSelectionHighlight() {
+    document.querySelectorAll(".grid-cell.selected").forEach((el) => el.classList.remove("selected"));
+    const gridEl = document.getElementById("grid");
+    for (const [r, c] of this.selectedCells) {
+      const index = r * this.gridSize + c;
+      if (gridEl.children[index]) {
+        gridEl.children[index].classList.add("selected");
+      }
     }
   }
 
   stopSelection() {
-    if (this.isSelecting && this.selectedCells.size > 0) {
+    if (this.isSelecting && this.selectedCells.length > 0) {
       this.checkSelectedWord();
     }
     this.isSelecting = false;
   }
 
   checkSelectedWord() {
-    const cells = Array.from(this.selectedCells)
-      .map((cell) => cell.split(",").map(Number))
-      .sort((a, b) => {
-        if (a[0] !== b[0]) return a[0] - b[0];
-        return a[1] - b[1];
-      });
-
-    if (cells.length < 2) {
-      this.selectedCells.clear();
+    if (this.selectedCells.length < 2) {
+      this.selectedCells = [];
       this.render();
       return;
     }
 
-    if (!this.checkStraightLine(cells)) {
-      this.showMessage("Выбор должен осуществляться по прямой линии", "error");
-      this.selectedCells.clear();
-      this.render();
-      return;
-    }
-
-    const selectedWord = cells
-      .map(([row, col]) => this.grid[row][col])
-      .join("");
-
+    const selectedWord = this.selectedCells.map(([r, c]) => this.grid[r][c]).join("");
     const reversedWord = selectedWord.split("").reverse().join("");
 
     const foundWord = this.words.find(
@@ -472,31 +421,19 @@ class WordSearchGame {
     if (foundWord) {
       this.foundWords.add(foundWord);
       this.saveProgress();
-
       this.showMessage(`Найдено: ${foundWord}!`, "success");
-
       if (this.foundWords.size === this.words.length) {
         this.levelComplete();
       }
     } else {
-      const wordInAll = allWords.find(
-        (w) => w === selectedWord || w === reversedWord,
-      );
-      if (
-        wordInAll &&
-        !this.words.includes(wordInAll) &&
-        !this.foundExtraWords.has(wordInAll)
-      ) {
+      const wordInAll = allWords.find((w) => w === selectedWord || w === reversedWord);
+      if (wordInAll && !this.words.includes(wordInAll) && !this.foundExtraWords.has(wordInAll)) {
         this.foundExtraWords.add(wordInAll);
         this.extraWordsFoundCount++;
         if (this.extraWordsFoundCount % 3 === 0) {
           this.hintsUsed++;
-          const hintWord = this.giveHint();
+          this.giveHint();
           this.saveProgress();
-          this.showMessage(
-            `Подсказка: ищи слово "${hintWord}"`,
-            "level-complete",
-          );
         } else {
           this.saveProgress();
           this.showMessage("Слово из другого уровня!", "success");
@@ -506,49 +443,29 @@ class WordSearchGame {
       }
     }
 
-    this.selectedCells.clear();
+    this.selectedCells = [];
     this.render();
   }
 
   giveHint() {
     const unfound = this.words.filter((word) => !this.foundWords.has(word));
-    if (unfound.length === 0) return null;
+    if (unfound.length === 0) return;
     const hintWord = unfound[Math.floor(Math.random() * unfound.length)];
 
-    const start = this.wordStartCells.get(hintWord);
-    if (!start) return hintWord;
+    const path = this.wordPaths.get(hintWord);
+    if (!path || path.length === 0) return;
 
-    const index = start.row * this.gridSize + start.col;
-    const cell = document.getElementById("grid")?.children[index];
+    const [r, c] = path[0];
+    const index = r * this.gridSize + c;
+    const gridEl = document.getElementById("grid");
+    const cell = gridEl?.children[index];
 
     if (cell) {
       cell.classList.add("hint");
-      setTimeout(() => cell.classList.remove("hint"), 2000);
+      setTimeout(() => cell.classList.remove("hint"), 3000);
     }
 
-    return hintWord;
-  }
-
-  checkStraightLine(cells) {
-    if (cells.length < 2) return true;
-
-    const [first, second] = cells;
-    const rowDiff = second[0] - first[0];
-    const colDiff = second[1] - first[1];
-
-    if (Math.abs(rowDiff) > 1 || Math.abs(colDiff) > 1) return false;
-    if (rowDiff === 0 && colDiff === 0) return false;
-
-    for (let i = 2; i < cells.length; i++) {
-      const expectedRow = first[0] + rowDiff * i;
-      const expectedCol = first[1] + colDiff * i;
-
-      if (cells[i][0] !== expectedRow || cells[i][1] !== expectedCol) {
-        return false;
-      }
-    }
-
-    return true;
+    this.showMessage(`Подсказка: найдена первая буква одного из слов!`, "level-complete");
   }
 
   levelComplete() {
@@ -563,13 +480,10 @@ class WordSearchGame {
       message = "Сложный уровень? Не сдавайся!";
     }
 
-    const confettiDiv = document.querySelector(
-      "#levelCompleteMessage .confetti",
-    );
+    const confettiDiv = document.querySelector("#levelCompleteMessage .confetti");
     confettiDiv.textContent = message;
 
     document.getElementById("levelCompleteMessage").style.display = "block";
-
     this.saveProgress();
   }
 
@@ -578,10 +492,7 @@ class WordSearchGame {
     messageEl.textContent = text;
     messageEl.className = `message ${type}`;
     messageEl.style.display = "block";
-
-    setTimeout(() => {
-      messageEl.style.display = "none";
-    }, 2000);
+    setTimeout(() => { messageEl.style.display = "none"; }, 2000);
   }
 
   render() {
@@ -598,7 +509,7 @@ class WordSearchGame {
     for (let i = 0; i < this.gridSize; i++) {
       for (let j = 0; j < this.gridSize; j++) {
         const cellKey = `${i},${j}`;
-        const isSelected = this.selectedCells.has(cellKey);
+        const isSelected = this.selectedCells.some(([r, c]) => r === i && c === j);
         const isFound = this.isCellFound(i, j);
 
         let cellClass = "grid-cell";
@@ -606,47 +517,37 @@ class WordSearchGame {
         if (isSelected) cellClass += " selected";
 
         html += `<div class="${cellClass}"
-        data-row="${i}"
-        data-col="${j}"
-        onmousedown="game.startSelection(${i}, ${j})"
-        onmouseover="game.addToSelection(${i}, ${j})"
-        ontouchstart="game.startSelection(${i}, ${j})"
-        ontouchmove="game.handleTouchMove(event)"
-        >
-        ${this.grid[i][j]}</div>`;
+          data-row="${i}"
+          data-col="${j}"
+          onmousedown="game.startSelection(${i}, ${j})"
+          onmouseover="game.addToSelection(${i}, ${j})"
+          ontouchstart="game.startSelection(${i}, ${j})"
+          ontouchmove="game.handleTouchMove(event)"
+        >${this.grid[i][j]}</div>`;
       }
     }
-
     gridEl.innerHTML = html;
   }
 
   handleTouchMove(event) {
     event.preventDefault();
-
     const touch = event.touches[0];
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
-
     if (!element) return;
-
     const cell = element.closest(".grid-cell");
     if (!cell) return;
-
     const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
-
     this.addToSelection(row, col);
   }
 
   renderFoundWords() {
     const container = document.getElementById("foundWords");
     const foundArray = Array.from(this.foundWords);
-
     if (foundArray.length === 0) {
-      container.innerHTML =
-        '<div class="empty-words">Пока ничего не найдено</div>';
+      container.innerHTML = '<div class="empty-words">Пока ничего не найдено</div>';
       return;
     }
-
     container.innerHTML = foundArray
       .map((word) => `<span class="found-word-badge">${word}</span>`)
       .join("");
@@ -660,9 +561,14 @@ class WordSearchGame {
     document.getElementById("foundCount").textContent = `${found}/${total}`;
     document.getElementById("progressFill").style.width = `${percentage}%`;
 
-    document.getElementById("hintsUsedCount").textContent = this.hintsUsed;
-    const toNext = 3 - (this.extraWordsFoundCount % 3);
-    document.getElementById("hintsNextCount").textContent = toNext;
+    const progressInCycle = this.extraWordsFoundCount % 3;
+    const hintBadge = document.getElementById("hintProgressBadge");
+    if (hintBadge) {
+      hintBadge.dataset.progress = progressInCycle;
+      hintBadge.querySelectorAll(".hint-pip").forEach((pip, idx) => {
+        pip.classList.toggle("filled", idx < progressInCycle);
+      });
+    }
   }
 }
 
