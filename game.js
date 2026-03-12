@@ -19,11 +19,11 @@ const RUSSIAN_ALPHABET = [
 ];
 
 const LINE_COLORS = [
-  "rgba(193,97,74,0.55)",
-  "rgba(90,127,106,0.55)",
-  "rgba(184,137,42,0.55)",
-  "rgba(74,134,168,0.55)",
-  "rgba(155,114,216,0.55)",
+  "rgba(193,97,74,0.82)",
+  "rgba(90,127,106,0.82)",
+  "rgba(184,137,42,0.82)",
+  "rgba(74,134,168,0.82)",
+  "rgba(155,114,216,0.82)",
 ];
 
 function removePrefixConflicts(words) {
@@ -585,6 +585,9 @@ class WordSearchGame {
       if (isFound) className += " found";
       if (isSelected) className += " selected";
       if (isHint) className += " hint";
+      if (!isFound && !isSelected && !isHint && this.grid[r][c] === this.themeLetter) {
+        className += " theme-letter";
+      }
       cell.className = className;
     });
   }
@@ -602,7 +605,7 @@ class WordSearchGame {
     if (cells.length === 0) return;
 
     const sampleRect = cells[0].getBoundingClientRect();
-    const strokeWidth = sampleRect.width * 0.72;
+    const strokeWidth = sampleRect.width * 0.38;
 
     let colorIdx = 0;
     for (const word of this.words) {

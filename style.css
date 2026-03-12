@@ -259,6 +259,11 @@ body {
   box-shadow: none;
 }
 
+.grid-cell.theme-letter {
+  background: var(--terra-light);
+  border-color: var(--terra-muted);
+}
+
 .grid-cell.hint {
   background: var(--sky-light);
   border-color: var(--sky);
