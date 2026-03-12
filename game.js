@@ -43,6 +43,7 @@ class WordSearchGame {
     this.extraWordsFoundCount = 0;
     this.wordStartCells = new Map();
     this.wordPaths = new Map();
+    this.hintCells = new Set();
 
     this.init();
   }
@@ -123,8 +124,17 @@ class WordSearchGame {
   }
 
   setupEventListeners() {
-    document.addEventListener("mouseup", () => this.stopSelection());
-    document.addEventListener("touchend", () => this.stopSelection());
+    document.addEventListener("pointerup", () => this.stopSelection());
+    document.addEventListener("pointercancel", () => this.stopSelection());
+
+    const gridEl = document.getElementById("grid");
+    gridEl.addEventListener("pointermove", (e) => {
+      if (!this.isSelecting) return;
+      const cell = document.elementFromPoint(e.clientX, e.clientY)?.closest(".grid-cell");
+      if (!cell) return;
+      this.addToSelection(parseInt(cell.dataset.row), parseInt(cell.dataset.col));
+    });
+
     document.getElementById("nextLevelBtn").addEventListener("click", () => this.nextLevel());
   }
 
@@ -147,6 +157,7 @@ class WordSearchGame {
     this.foundExtraWords = new Set();
     this.wordStartCells.clear();
     this.wordPaths.clear();
+    this.hintCells = new Set();
 
     const randomLetter = RUSSIAN_ALPHABET[Math.floor(Math.random() * RUSSIAN_ALPHABET.length)];
     const wordsWithLetter = allWords.filter(
@@ -456,14 +467,13 @@ class WordSearchGame {
     if (!path || path.length === 0) return;
 
     const [r, c] = path[0];
-    const index = r * this.gridSize + c;
-    const gridEl = document.getElementById("grid");
-    const cell = gridEl?.children[index];
+    const key = `${r},${c}`;
+    this.hintCells.add(key);
 
-    if (cell) {
-      cell.classList.add("hint");
-      setTimeout(() => cell.classList.remove("hint"), 3000);
-    }
+    setTimeout(() => {
+      this.hintCells.delete(key);
+      this.renderGrid();
+    }, 3000);
 
     this.showMessage(`Подсказка: найдена первая буква одного из слов!`, "level-complete");
   }
@@ -511,34 +521,24 @@ class WordSearchGame {
         const cellKey = `${i},${j}`;
         const isSelected = this.selectedCells.some(([r, c]) => r === i && c === j);
         const isFound = this.isCellFound(i, j);
+        const isHint = this.hintCells.has(cellKey);
 
         let cellClass = "grid-cell";
         if (isFound) cellClass += " found";
         if (isSelected) cellClass += " selected";
+        if (isHint) cellClass += " hint";
 
-        html += `<div class="${cellClass}"
-          data-row="${i}"
-          data-col="${j}"
-          onmousedown="game.startSelection(${i}, ${j})"
-          onmouseover="game.addToSelection(${i}, ${j})"
-          ontouchstart="game.startSelection(${i}, ${j})"
-          ontouchmove="game.handleTouchMove(event)"
-        >${this.grid[i][j]}</div>`;
+        html += `<div class="${cellClass}" data-row="${i}" data-col="${j}">${this.grid[i][j]}</div>`;
       }
     }
     gridEl.innerHTML = html;
-  }
 
-  handleTouchMove(event) {
-    event.preventDefault();
-    const touch = event.touches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (!element) return;
-    const cell = element.closest(".grid-cell");
-    if (!cell) return;
-    const row = parseInt(cell.dataset.row);
-    const col = parseInt(cell.dataset.col);
-    this.addToSelection(row, col);
+    gridEl.onpointerdown = (e) => {
+      const cell = e.target.closest(".grid-cell");
+      if (!cell) return;
+      gridEl.setPointerCapture(e.pointerId);
+      this.startSelection(parseInt(cell.dataset.row), parseInt(cell.dataset.col));
+    };
   }
 
   renderFoundWords() {
