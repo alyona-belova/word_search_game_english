@@ -155,6 +155,7 @@ body {
   padding: 2px 12px;
   border-radius: var(--radius-pill);
   white-space: nowrap;
+  line-height: 1;
 }
 
 .word-search-grid {
