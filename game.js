@@ -53,6 +53,12 @@ class WordSearchGame {
     this.wordPaths = new Map();
     this.hintCells = new Set();
 
+    this.abGroup = localStorage.getItem("abGroup");
+    if (!this.abGroup) {
+      this.abGroup = Math.random() < 0.5 ? "A" : "B";
+      localStorage.setItem("abGroup", this.abGroup);
+    }
+
     this.init();
   }
 
@@ -566,6 +572,8 @@ class WordSearchGame {
       gridEl.setPointerCapture(e.pointerId);
       this.startSelection(parseInt(cell.dataset.row), parseInt(cell.dataset.col));
     };
+
+    this.renderWordList();
   }
 
   updateCellStates() {
@@ -641,8 +649,22 @@ class WordSearchGame {
   render() {
     this.updateCellStates();
     this.renderFoundWords();
+    this.renderWordList();
     this.updateProgress();
     this.drawLines();
+  }
+
+  renderWordList() {
+    const section = document.getElementById("wordListSection");
+    if (!section) return;
+    if (this.abGroup !== "B") {
+      section.style.display = "none";
+      return;
+    }
+    section.style.display = "block";
+    document.getElementById("wordList").innerHTML = this.words
+      .map(word => `<span class="word-list-item${this.foundWords.has(word) ? " found" : ""}">${word}</span>`)
+      .join("");
   }
 
   renderFoundWords() {

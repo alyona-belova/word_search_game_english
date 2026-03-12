@@ -356,6 +356,45 @@ body {
   transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+.word-list-section {
+  display: none;
+}
+
+.word-list-header {
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.word-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.word-list-item {
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-soft);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.word-list-item.found {
+  text-decoration: line-through;
+  color: var(--text-muted);
+  background: var(--border-soft);
+  border-color: transparent;
+}
+
 .hints-row {
   display: flex;
   align-items: center;
