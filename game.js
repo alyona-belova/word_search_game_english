@@ -84,7 +84,6 @@ class WordSearchGame {
     this.foundExtraWords = new Set();
     this.hintsUsed = 0;
     this.extraWordsFoundCount = 0;
-    this.wordStartCells = new Map();
     this.wordPaths = new Map();
     this.hintCells = new Set();
 
@@ -171,10 +170,6 @@ class WordSearchGame {
     this.loadLevel();
   }
 
-  updateGridSizeVariable() {
-    document.documentElement.style.setProperty("--grid-size", this.gridSize);
-  }
-
   setupEventListeners() {
     document.addEventListener("pointerup", () => this.stopSelection());
     document.addEventListener("pointercancel", () => this.stopSelection());
@@ -199,7 +194,6 @@ class WordSearchGame {
 
   nextLevel() {
     this.currentLevel++;
-    this.extraWords = [];
     this.loadLevel();
     this.saveProgress();
   }
@@ -216,7 +210,6 @@ class WordSearchGame {
     this.extraWordsFoundCount = 0;
     this.extraWords = [];
     this.foundExtraWords = new Set();
-    this.wordStartCells.clear();
     this.wordPaths.clear();
     this.hintCells = new Set();
 
@@ -252,6 +245,10 @@ class WordSearchGame {
       (a, b) => b.length - a.length,
     );
 
+    if (this.words.length < 4) {
+      return this.loadLevel(attempt + 1);
+    }
+
     this.foundWords.clear();
     this.selectedCells = [];
     this.placements.clear();
@@ -259,7 +256,6 @@ class WordSearchGame {
     this.levelName = `Буква "${randomLetter}"`;
     this.updateThemeDisplay({ name: this.levelName });
     this.generateGrid();
-    this.updateGridSizeVariable();
     this.buildGrid();
     this.render();
 
@@ -278,9 +274,6 @@ class WordSearchGame {
         const key = `${r},${c}`;
         if (!this.placements.has(key)) this.placements.set(key, new Set());
         this.placements.get(key).add(word);
-      }
-      if (path.length > 0) {
-        this.wordStartCells.set(word, { row: path[0][0], col: path[0][1] });
       }
     }
   }
@@ -308,7 +301,6 @@ class WordSearchGame {
       Array(this.gridSize).fill(null),
     );
     this.wordPaths.clear();
-    this.wordStartCells.clear();
 
     for (const word of this.words) {
       this.placeWordSnaking(word);
@@ -393,7 +385,11 @@ class WordSearchGame {
     }
 
     const [pdr, pdc] = prevDir;
-    const dot = ([dr, dc]) => dr * pdr + dc * pdc;
+    const prevLen = Math.sqrt(pdr * pdr + pdc * pdc);
+    const dot = ([dr, dc]) => {
+      const len = Math.sqrt(dr * dr + dc * dc);
+      return (dr * pdr + dc * pdc) / (len * prevLen);
+    };
     const tier = ([, , dr, dc]) => {
       const d = dot([dr, dc]);
       if (d > 0.7) return 0;
@@ -413,7 +409,6 @@ class WordSearchGame {
 
   commitSnakingPath(word, path) {
     this.wordPaths.set(word, path);
-    this.wordStartCells.set(word, { row: path[0][0], col: path[0][1] });
 
     for (let i = 0; i < path.length; i++) {
       const [r, c] = path[i];
