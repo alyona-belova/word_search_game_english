@@ -18,6 +18,14 @@ const RUSSIAN_ALPHABET = [
   "А", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "Ь", "Э", "Ю", "Я",
 ];
 
+const LINE_COLORS = [
+  "rgba(193,97,74,0.55)",
+  "rgba(90,127,106,0.55)",
+  "rgba(184,137,42,0.55)",
+  "rgba(74,134,168,0.55)",
+  "rgba(155,114,216,0.55)",
+];
+
 function removePrefixConflicts(words) {
   return words.filter(
     (w) => !words.some((other) => other !== w && (other.startsWith(w) || w.startsWith(other))),
@@ -99,6 +107,7 @@ class WordSearchGame {
         );
         this.updateThemeDisplay({ name: this.levelName });
         this.rebuildPlacements();
+        this.buildGrid();
         this.render();
         if (this.foundWords.size === this.words.length) {
           document.getElementById("levelCompleteMessage").style.display = "block";
@@ -194,6 +203,7 @@ class WordSearchGame {
     this.updateThemeDisplay({ name: this.levelName });
     this.generateGrid();
     this.updateGridSizeVariable();
+    this.buildGrid();
     this.render();
 
     if (this.currentLevel === 1 && !this.demoWordShown) {
@@ -317,9 +327,7 @@ class WordSearchGame {
     }
 
     const [pdr, pdc] = prevDir;
-
     const dot = ([dr, dc]) => dr * pdr + dc * pdc;
-
     const tier = ([, , dr, dc]) => {
       const d = dot([dr, dc]);
       if (d > 0.4) return 0;
@@ -333,7 +341,6 @@ class WordSearchGame {
     }
 
     candidates.sort((a, b) => tier(a) - tier(b));
-
     return candidates.map(([nr, nc]) => [nr, nc]);
   }
 
@@ -384,7 +391,7 @@ class WordSearchGame {
 
     if (this.hintCells.size > 0) {
       this.hintCells.clear();
-      this.renderGrid();
+      this.updateCellStates();
     }
 
     this.isSelecting = true;
@@ -405,8 +412,6 @@ class WordSearchGame {
   addToSelection(row, col) {
     if (!this.isSelecting) return;
     if (this.isCellFound(row, col)) return;
-
-    const key = `${row},${col}`;
 
     const existingIdx = this.selectedCells.findIndex(([r, c]) => r === row && c === col);
     if (existingIdx !== -1) {
@@ -451,12 +456,16 @@ class WordSearchGame {
 
     const selectedWord = this.selectedCells.map(([r, c]) => this.grid[r][c]).join("");
     const reversedWord = selectedWord.split("").reverse().join("");
+    const n = this.selectedCells.length;
 
-    const foundWord = this.words.find(
-      (word) =>
-        !this.foundWords.has(word) &&
-        (word === selectedWord || word === reversedWord),
-    );
+    const foundWord = this.words.find(word => {
+      if (this.foundWords.has(word)) return false;
+      const path = this.wordPaths.get(word);
+      if (!path || path.length !== n) return false;
+      const fwd = path.every(([r, c], i) => this.selectedCells[i][0] === r && this.selectedCells[i][1] === c);
+      if (fwd) return true;
+      return path.every(([r, c], i) => this.selectedCells[n - 1 - i][0] === r && this.selectedCells[n - 1 - i][1] === c);
+    });
 
     if (foundWord) {
       this.foundWords.add(foundWord);
@@ -495,9 +504,7 @@ class WordSearchGame {
     const path = this.wordPaths.get(hintWord);
     if (!path || path.length === 0) return;
 
-    const keys = path.map(([r, c]) => `${r},${c}`);
-    keys.forEach(key => this.hintCells.add(key));
-
+    path.forEach(([r, c]) => this.hintCells.add(`${r},${c}`));
     this.showMessage(`Подсказка: одно из слов подсвечено на поле!`, "level-complete");
   }
 
@@ -522,39 +529,36 @@ class WordSearchGame {
 
   showMessage(text, type) {
     const messageEl = document.getElementById("message");
+    clearTimeout(this._msgTimer);
     messageEl.textContent = text;
     messageEl.className = `message ${type}`;
     messageEl.style.display = "block";
-    setTimeout(() => { messageEl.style.display = "none"; }, 2000);
+    this._msgTimer = setTimeout(() => { messageEl.style.display = "none"; }, 2000);
   }
 
-  render() {
-    this.renderGrid();
-    this.renderFoundWords();
-    this.updateProgress();
-  }
-
-  renderGrid() {
+  buildGrid() {
     const gridEl = document.getElementById("grid");
+    const wrapper = gridEl.parentElement;
+
+    wrapper.querySelector(".word-lines-svg")?.remove();
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add("word-lines-svg");
+    wrapper.appendChild(svg);
+
+    gridEl.innerHTML = "";
     gridEl.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
 
-    let html = "";
     for (let i = 0; i < this.gridSize; i++) {
       for (let j = 0; j < this.gridSize; j++) {
-        const cellKey = `${i},${j}`;
-        const isSelected = this.selectedCells.some(([r, c]) => r === i && c === j);
-        const isFound = this.isCellFound(i, j);
-        const isHint = this.hintCells.has(cellKey);
-
-        let cellClass = "grid-cell";
-        if (isFound) cellClass += " found";
-        if (isSelected) cellClass += " selected";
-        if (isHint) cellClass += " hint";
-
-        html += `<div class="${cellClass}" data-row="${i}" data-col="${j}">${this.grid[i][j]}</div>`;
+        const cell = document.createElement("div");
+        cell.className = "grid-cell";
+        cell.dataset.row = i;
+        cell.dataset.col = j;
+        cell.textContent = this.grid[i][j];
+        gridEl.appendChild(cell);
       }
     }
-    gridEl.innerHTML = html;
 
     gridEl.onpointerdown = (e) => {
       const cell = e.target.closest(".grid-cell");
@@ -562,6 +566,80 @@ class WordSearchGame {
       gridEl.setPointerCapture(e.pointerId);
       this.startSelection(parseInt(cell.dataset.row), parseInt(cell.dataset.col));
     };
+  }
+
+  updateCellStates() {
+    const gridEl = document.getElementById("grid");
+    const cells = gridEl.querySelectorAll(".grid-cell");
+
+    cells.forEach(cell => {
+      const r = parseInt(cell.dataset.row);
+      const c = parseInt(cell.dataset.col);
+      const cellKey = `${r},${c}`;
+
+      const isSelected = this.selectedCells.some(([sr, sc]) => sr === r && sc === c);
+      const isFound = this.isCellFound(r, c);
+      const isHint = this.hintCells.has(cellKey);
+
+      let className = "grid-cell";
+      if (isFound) className += " found";
+      if (isSelected) className += " selected";
+      if (isHint) className += " hint";
+      cell.className = className;
+    });
+  }
+
+  drawLines() {
+    const gridEl = document.getElementById("grid");
+    const wrapper = gridEl.parentElement;
+    const svg = wrapper.querySelector(".word-lines-svg");
+    if (!svg) return;
+
+    svg.innerHTML = "";
+
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const cells = gridEl.querySelectorAll(".grid-cell");
+    if (cells.length === 0) return;
+
+    const sampleRect = cells[0].getBoundingClientRect();
+    const strokeWidth = sampleRect.width * 0.72;
+
+    let colorIdx = 0;
+    for (const word of this.words) {
+      if (!this.foundWords.has(word)) continue;
+      const path = this.wordPaths.get(word);
+      if (!path || path.length < 2) continue;
+
+      const points = [];
+      for (const [r, c] of path) {
+        const cellEl = cells[r * this.gridSize + c];
+        if (!cellEl) continue;
+        const rect = cellEl.getBoundingClientRect();
+        const cx = rect.left - wrapperRect.left + rect.width / 2;
+        const cy = rect.top - wrapperRect.top + rect.height / 2;
+        points.push(`${cx},${cy}`);
+      }
+
+      if (points.length < 2) continue;
+
+      const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      polyline.setAttribute("points", points.join(" "));
+      polyline.setAttribute("stroke", LINE_COLORS[colorIdx % LINE_COLORS.length]);
+      polyline.setAttribute("stroke-width", strokeWidth);
+      polyline.setAttribute("stroke-linecap", "round");
+      polyline.setAttribute("stroke-linejoin", "round");
+      polyline.setAttribute("fill", "none");
+      svg.appendChild(polyline);
+
+      colorIdx++;
+    }
+  }
+
+  render() {
+    this.updateCellStates();
+    this.renderFoundWords();
+    this.updateProgress();
+    this.drawLines();
   }
 
   renderFoundWords() {
