@@ -713,7 +713,7 @@ class WordSearchGame {
     wrapper.appendChild(svg);
 
     gridEl.innerHTML = "";
-    gridEl.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
+    gridEl.style.gridTemplateColumns = `repeat(${this.gridSize}, minmax(0, 1fr))`;
 
     for (let i = 0; i < this.gridSize; i++) {
       for (let j = 0; j < this.gridSize; j++) {
