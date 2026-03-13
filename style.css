@@ -195,6 +195,7 @@ body {
   container-type: inline-size;
   container-name: gridwrap;
   position: relative;
+  overflow: hidden;
 }
 
 .word-lines-svg {
@@ -709,5 +710,154 @@ body {
 
   .grid-wrapper {
     --grid-padding: 8px;
+  }
+}
+
+/* ── Tutorial modal ─────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(46, 34, 24, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  padding: 32px 28px 28px;
+  max-width: 460px;
+  width: 100%;
+  animation: cardPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-title {
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.tutorial-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.tutorial-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.step-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.step-text strong {
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  display: block;
+  margin-bottom: 3px;
+}
+
+.step-text p {
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  line-height: 1.55;
+  font-weight: 600;
+}
+
+.tutorial-close-btn {
+  display: block;
+  width: 100%;
+  background: var(--terra);
+  color: #fff;
+  border: none;
+  padding: 14px 24px;
+  border-radius: var(--radius-pill);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+  box-shadow: 0 4px 14px rgba(193, 97, 74, 0.35);
+}
+
+.tutorial-close-btn:hover {
+  background: #a8503b;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(193, 97, 74, 0.4);
+}
+
+.tutorial-close-btn:active {
+  transform: scale(0.97);
+}
+
+/* ── Help button (?) ─────────────────────────────────────── */
+
+.help-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--terra);
+  color: #fff;
+  border: none;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(193, 97, 74, 0.4);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.help-btn:hover {
+  background: #a8503b;
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 8px 22px rgba(193, 97, 74, 0.45);
+}
+
+.help-btn:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 740px) {
+  .help-btn {
+    bottom: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
   }
 }

@@ -99,6 +99,60 @@
         </div>
       </div>
     </div>
+    <div id="tutorialModal" class="modal-overlay" style="display: none">
+      <div class="modal-card">
+        <h2 class="modal-title">Как играть?</h2>
+        <div class="tutorial-steps">
+          <div class="tutorial-step">
+            <div class="step-icon">✍️</div>
+            <div class="step-text">
+              <strong>Буква уровня</strong>
+              <p>
+                На каждом уровне задается новая буква, которую будут содержать
+                все слова для поиска. Она может быть в начале слова, в середине
+                или в конце.
+              </p>
+            </div>
+          </div>
+          <div class="tutorial-step">
+            <div class="step-icon">🐍</div>
+            <div class="step-text">
+              <strong>Слова-змейки</strong>
+              <p>
+                Слова расползаются по клеткам как змейка — в любом направлении,
+                включая диагонали и кривые линии.
+              </p>
+            </div>
+          </div>
+          <div class="tutorial-step">
+            <div class="step-icon">💡</div>
+            <div class="step-text">
+              <strong>Подсказки</strong>
+              <p>
+                Найдите 3 слова не из текущего уровня и получите подсказку: одно
+                из нужных слов подсветится на поле.
+              </p>
+            </div>
+          </div>
+          <div class="tutorial-step">
+            <div class="step-icon">🏆</div>
+            <div class="step-text">
+              <strong>Цель</strong>
+              <p>
+                Чтобы пройти уровень, нужно найти все спрятанные слова. Чем
+                меньше подсказок, тем лучше :&#41;
+              </p>
+            </div>
+          </div>
+        </div>
+        <button id="tutorialClose" class="tutorial-close-btn">
+          Начать играть!
+        </button>
+      </div>
+    </div>
+
+    <button id="helpBtn" class="help-btn" title="Как играть?">?</button>
+
     <script src="game.js"></script>
   </body>
 </html>
