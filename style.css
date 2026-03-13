@@ -192,8 +192,6 @@ body {
   border: 1.5px solid var(--border);
   box-shadow: var(--shadow-lg);
   width: 100%;
-  container-type: inline-size;
-  container-name: gridwrap;
   position: relative;
   overflow: hidden;
 }
