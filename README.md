@@ -4,8 +4,6 @@ A word search puzzle game. Each level challenges you to find hidden words snakin
 
 ![Game Logo](game_logo.png)
 
----
-
 ## How to Play
 
 1. **Find the theme letter** — every level has one highlighted letter that all target words contain
@@ -13,20 +11,14 @@ A word search puzzle game. Each level challenges you to find hidden words snakin
 3. **Words snake** — words can twist, turn, and change direction, like a snake
 4. **Earn hints** — find 3 bonus words (words from other levels) to unlock a hint that highlights one remaining word
 
----
-
 ## Features
 
 - **10,000+ Russian words** loaded from a curated word list
 - **Infinite levels** — each level randomly picks a theme letter and matching words
 - **Snaking paths** — words are placed using a DFS pathfinding algorithm with direction bias for natural-looking curves
-- **5 color palette** — found words rendered as colored SVG polylines over the grid
+- Found words rendered as **colored SVG polylines** over the grid
 - **Hint system** — rewards exploration of bonus words
 - **Progress persistence** — game state saved to `localStorage` so you never lose your place
-- **First-time tutorial** — a modal walkthrough shown on first visit, always accessible via `?`
-- **A/B testing** — randomized UI variants for found-word display (badge vs. list)
-
----
 
 ## Tech Stack
 
@@ -37,27 +29,6 @@ A word search puzzle game. Each level challenges you to find hidden words snakin
 | Styling | CSS with custom properties, `clamp()`, grid layout |
 | Storage | `localStorage` |
 | Build | `tsc` |
-
-No frameworks. No bundler. Just TypeScript compiled to a single `game.js`.
-
----
-
-## Project Structure
-
-```
-word_search_game/
-├── game.ts               # Core game engine (~900 lines)
-├── game.js               # Compiled output
-├── index.html            # App shell + Russian UI copy
-├── style.css             # Styles, animations, responsive layout
-├── game_logo.png         # Logo
-├── data/
-│   └── words_list_extended.txt   # 10,171 Russian words
-├── package.json
-└── tsconfig.json
-```
-
----
 
 ## Getting Started
 
@@ -81,8 +52,6 @@ npx serve .
 # or
 python3 -m http.server
 ```
-
----
 
 ## Architecture Notes
 
