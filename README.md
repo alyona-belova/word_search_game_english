@@ -45,14 +45,6 @@ npm run build
 npm run watch
 ```
 
-Then open `index.html` in a browser. No server required — the word list is loaded via `fetch`, so you may need a local HTTP server if your browser blocks local file requests:
-
-```bash
-npx serve .
-# or
-python3 -m http.server
-```
-
 ## Architecture Notes
 
 ### Grid Generation
