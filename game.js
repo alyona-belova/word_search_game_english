@@ -122,6 +122,12 @@ class WordSearchGame {
         }
         this.setupEventListeners();
         setupTutorial();
+        trackSessionStart(this.abGroup);
+        window.addEventListener("beforeunload", () => {
+            if (this.foundWords.size < this.words.length) {
+                trackDropOff(this.currentLevel, this.foundWords.size, this.words.length);
+            }
+        });
     }
     saveProgress() {
         try {
@@ -260,6 +266,7 @@ class WordSearchGame {
         const lvlComplete = document.getElementById("levelCompleteMessage");
         if (lvlComplete)
             lvlComplete.style.display = "none";
+        trackLevelStart(this.currentLevel, this.themeLetter);
     }
     rebuildPlacements() {
         this.placements.clear();
@@ -538,6 +545,7 @@ class WordSearchGame {
             return;
         path.forEach(([r, c]) => this.hintCells.add(`${r},${c}`));
         this.showMessage("Подсказка: одно из слов подсвечено на поле!", "level-complete");
+        trackHintReceived(this.currentLevel, this.foundWords.size, this.words.length);
     }
     levelComplete() {
         let message = "";
@@ -560,6 +568,7 @@ class WordSearchGame {
         if (lvlComplete)
             lvlComplete.style.display = "block";
         this.saveProgress();
+        trackLevelComplete(this.currentLevel, this.hintsUsed, this.words.length);
     }
     showMessage(text, type) {
         const messageEl = document.getElementById("message");

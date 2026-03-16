@@ -3,21 +3,79 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Зигзаг — игра в слова. Найди все спрятанные слова, петляющие по сетке из букв." />
-    <meta name="keywords" content="зигзаг, филворд, игра в слова, поиск слов, головоломка" />
+    <meta
+      name="description"
+      content="Зигзаг — игра в слова. Найди все спрятанные слова, петляющие по сетке из букв."
+    />
+    <meta
+      name="keywords"
+      content="зигзаг, филворд, игра в слова, поиск слов, головоломка"
+    />
     <meta name="robots" content="index, follow" />
-    <meta name="google-site-verification" content="GYx6_DAuvatEQXPwaPTeLCGrM90qHb__5pO9PDcsDCo" />
-    <link rel="canonical" href="https://alyona-belova.github.io/word_search_game/" />
+    <meta
+      name="google-site-verification"
+      content="GYx6_DAuvatEQXPwaPTeLCGrM90qHb__5pO9PDcsDCo"
+    />
+    <link
+      rel="canonical"
+      href="https://alyona-belova.github.io/word_search_game/"
+    />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Зигзаг — игра в слова" />
-    <meta property="og:description" content="Найди все спрятанные слова, петляющие по сетке из букв." />
-    <meta property="og:url" content="https://alyona-belova.github.io/word_search_game/" />
+    <meta
+      property="og:description"
+      content="Найди все спрятанные слова, петляющие по сетке из букв."
+    />
+    <meta
+      property="og:url"
+      content="https://alyona-belova.github.io/word_search_game/"
+    />
     <meta property="og:image" content="game_logo.png" />
     <meta property="og:locale" content="ru_RU" />
     <title>Зигзаг — найди все слова!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="style.css" />
+
+    <script type="text/javascript">
+      (function (m, e, t, r, i, k, a) {
+        m[i] =
+          m[i] ||
+          function () {
+            (m[i].a = m[i].a || []).push(arguments);
+          };
+        m[i].l = 1 * new Date();
+        for (var j = 0; j < document.scripts.length; j++) {
+          if (document.scripts[j].src === r) {
+            return;
+          }
+        }
+        ((k = e.createElement(t)),
+          (a = e.getElementsByTagName(t)[0]),
+          (k.async = 1),
+          (k.src = r),
+          a.parentNode.insertBefore(k, a));
+      })(
+        window,
+        document,
+        "script",
+        "https://mc.yandex.ru/metrika/tag.js",
+        "ym",
+      );
+      ym(107726491, "init", {
+        clickmap: true,
+        trackLinks: true,
+        accurateTrackBounce: true,
+      });
+    </script>
+    <noscript
+      ><div>
+        <img
+          src="https://mc.yandex.ru/watch/107726491"
+          style="position: absolute; left: -9999px"
+          alt=""
+        /></div
+    ></noscript>
   </head>
   <body>
     <div class="container">
@@ -119,7 +177,8 @@
             <div class="step-text">
               <strong>Слова-зигзаги</strong>
               <p>
-                Слова располагаются по ломаным линиям — каждая следующая буква может быть в любой из 8 соседних клеток.
+                Слова располагаются по ломаным линиям — каждая следующая буква
+                может быть в любой из 8 соседних клеток.
               </p>
             </div>
           </div>
@@ -128,8 +187,8 @@
             <div class="step-text">
               <strong>Подсказки</strong>
               <p>
-                Найди 3 слова не из текущего уровня, чтобы получить подсказку: одно
-                из нужных слов подсветится на поле.
+                Найди 3 слова не из текущего уровня, чтобы получить подсказку:
+                одно из нужных слов подсветится на поле.
               </p>
             </div>
           </div>
@@ -152,6 +211,7 @@
 
     <button id="helpBtn" class="help-btn" title="Как играть?">?</button>
 
+    <script src="analytics.js"></script>
     <script src="game.js"></script>
   </body>
 </html>

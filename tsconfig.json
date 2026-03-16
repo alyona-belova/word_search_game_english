@@ -5,5 +5,5 @@
     "skipLibCheck": true,
     "lib": ["ES2020", "DOM"]
   },
-  "files": ["game.ts"]
+  "files": ["analytics.ts", "game.ts"]
 }
