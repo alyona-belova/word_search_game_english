@@ -1,60 +1,37 @@
-# Змейка — Word Search Game
+# Зигзаг — игра в слова
 
-A word search puzzle game. Each level challenges you to find hidden words snaking through a 12×12 letter grid, all sharing a common theme letter.
+Головоломка по поиску слов. На каждом уровне нужно найти в сетке из букв спрятанные слова, содержащие определенную букву.
 
-![Game Logo](game_logo.png)
+![Логотип игры](game_logo.png)
 
-## How to Play
+## Особенности
 
-1. **Find the theme letter** — every level has one highlighted letter that all target words contain
-2. **Drag to select** — trace a path across the grid to spell out a word
-3. **Words snake** — words can twist, turn, and change direction, like a snake
-4. **Earn hints** — find 3 bonus words (words from other levels) to unlock a hint that highlights one remaining word
+- Каждый уровень случайно выбирает букву темы и подходящие слова
+- Слова могут изгибаться и менять направление. Они размещаются с помощью алгоритма обхода в глубину (DFS) с предпочтением прямого направления (для естественных изгибов)
+- Если найти 3 бонусных слова, то разблокируется подсказка, которая подсветит одно из оставшихся слов
+- Найденные слова отображаются в виде цветных SVG-линий поверх сетки
+- Словарь состоит из 10 000+ тщательно отобранных слов на русском языке
+- Состояние игры сохраняется в localStorage
 
-## Features
+## Технологии
 
-- **10,000+ Russian words** loaded from a curated word list
-- **Infinite levels** — each level randomly picks a theme letter and matching words
-- **Snaking paths** — words are placed using a DFS pathfinding algorithm with direction bias for natural-looking curves
-- Found words rendered as **colored SVG polylines** over the grid
-- **Hint system** — rewards exploration of bonus words
-- **Progress persistence** — game state saved to `localStorage` so you never lose your place
-
-## Tech Stack
-
-| Layer | Technology |
+| Слой | Технология |
 |---|---|
-| Language | TypeScript (compiled to ES2020) |
-| Rendering | Vanilla DOM + SVG overlays |
-| Styling | CSS with custom properties, `clamp()`, grid layout |
-| Storage | `localStorage` |
-| Build | `tsc` |
+| Язык | TypeScript |
+| Рендеринг | Vanilla DOM + SVG overlays |
+| Стили | CSS с пользовательскими свойствами, clamp(), grid layout |
+| Хранилище | localStorage |
 
-## Getting Started
+## Начало работы
 
-**Requirements:** Node.js (for TypeScript compiler)
-
+**Требования:** Node.js (для компилятора TypeScript)
 ```bash
-# Install dependencies
+# Установить зависимости
 npm install
 
-# Build once
+# Запустить локально
+npm run dev
+
+# Собрать для продакшена
 npm run build
-
-# Watch mode (rebuilds on save)
-npm run watch
 ```
-
-## Architecture Notes
-
-### Grid Generation
-A 12×12 grid is populated by placing words one at a time using `placeWordSnaking()`. Each word is threaded through the grid along a path built by a biased DFS: the algorithm prefers to continue in the current direction before trying other directions, producing organic-looking curves.
-
-### Word Selection & Validation
-Player selections are tracked as a sequence of `[row, col]` cells. On pointer-up, the selected string is checked against all unfound theme words. Non-theme words that match the word list count toward the hint counter.
-
-### Hint System
-Finding 3 extra (non-theme) words unlocks one hint. A hint animates the cells of one remaining theme word, giving the player a nudge without fully solving it.
-
-### Persistence
-`GameProgress` is serialized to JSON and stored in `localStorage`. It captures the full grid state, found words, hint counts, current level, and A/B group assignment.
