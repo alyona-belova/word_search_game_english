@@ -534,13 +534,12 @@ class WordSearchGame {
   }
 
   fillEmptyCells(): void {
+    const fillAlphabet = RUSSIAN_ALPHABET.filter(l => l !== this.themeLetter);
     for (let i = 0; i < this.gridSize; i++) {
       for (let j = 0; j < this.gridSize; j++) {
         if (this.grid[i][j] === null) {
           this.grid[i][j] =
-            RUSSIAN_ALPHABET[
-              Math.floor(Math.random() * RUSSIAN_ALPHABET.length)
-            ];
+            fillAlphabet[Math.floor(Math.random() * fillAlphabet.length)];
         }
       }
     }

@@ -411,9 +411,9 @@ class WordSearchGame {
     placeExtraWords() {
         const candidates = allWords
             .filter((word) => !word.includes(this.themeLetter) &&
-            !this.words.includes(word) &&
-            word.length >= 3 &&
-            word.length <= this.gridSize)
+                !this.words.includes(word) &&
+                word.length >= 3 &&
+                word.length <= this.gridSize)
             .sort(() => Math.random() - 0.5)
             .slice(0, 80);
         for (const word of candidates) {
@@ -423,11 +423,12 @@ class WordSearchGame {
         }
     }
     fillEmptyCells() {
+        const fillAlphabet = RUSSIAN_ALPHABET.filter(l => l !== this.themeLetter);
         for (let i = 0; i < this.gridSize; i++) {
             for (let j = 0; j < this.gridSize; j++) {
                 if (this.grid[i][j] === null) {
                     this.grid[i][j] =
-                        RUSSIAN_ALPHABET[Math.floor(Math.random() * RUSSIAN_ALPHABET.length)];
+                        fillAlphabet[Math.floor(Math.random() * fillAlphabet.length)];
                 }
             }
         }
