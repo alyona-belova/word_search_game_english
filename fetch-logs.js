@@ -6,8 +6,8 @@
 import https from "https";
 import fs from "fs";
 
-const TOKEN = "your_token";
-const COUNTER = "your_counter";
+const TOKEN = "token";
+const COUNTER = "counter";
 
 const today = new Date();
 const thirtyAgo = new Date(+today - 30 * 24 * 60 * 60 * 1000);
@@ -21,7 +21,6 @@ const FIELDS = [
   "ym:s:clientID",
   "ym:s:isNewUser",
   "ym:s:visitDuration",
-  "ym:s:goalsID",
   "ym:s:params",
 ].join(",");
 
@@ -68,7 +67,7 @@ async function main() {
       }),
   );
   if (createRes.status !== 200) {
-    console.error("Create failed:", JSON.stringify(createRes.body, null, 2));
+    console.error(`Create failed [HTTP ${createRes.status}]:`, JSON.stringify(createRes.body, null, 2));
     process.exit(1);
   }
   const requestId = createRes.body.log_request?.request_id;

@@ -6,7 +6,11 @@ function track(goal, params) {
 }
 function setVisitParams(params) {
   if (typeof ym === "undefined") return;
-  ym(METRICA_COUNTER_ID, "params", params);
+  const nested = {};
+  for (const [k, v] of Object.entries(params)) {
+    nested[k] = { [String(v)]: 1 };
+  }
+  ym(METRICA_COUNTER_ID, "params", nested);
 }
 const _sessionStart = Date.now();
 function trackSessionStart(abGroup) {
