@@ -531,6 +531,7 @@ class WordSearchGame {
       const hasConflict = this.pathsConflict(userPath, foundWord);
       if (!hasConflict) {
         this.wordPaths.set(foundWord, userPath);
+        this.rebuildPlacements();
       }
       this.foundWords.add(foundWord);
       this.saveProgress();
