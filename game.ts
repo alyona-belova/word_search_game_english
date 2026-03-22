@@ -133,6 +133,8 @@ class WordSearchGame {
   wordPaths: Map<string, Cell[]>;
   hintCells: Set<string>;
   abGroup: string;
+  levelSeq: number;
+  _firstWordFoundInLevel: boolean;
 
   private _resizeTimer?: ReturnType<typeof setTimeout>;
   private _msgTimer?: ReturnType<typeof setTimeout>;
@@ -161,6 +163,8 @@ class WordSearchGame {
       this.abGroup = Math.random() < 0.5 ? "A" : "B";
       localStorage.setItem("abGroup", this.abGroup);
     }
+    this.levelSeq = 0;
+    this._firstWordFoundInLevel = false;
 
     this.init();
   }
@@ -315,6 +319,8 @@ class WordSearchGame {
     this.foundExtraWords = new Set();
     this.wordPaths.clear();
     this.hintCells = new Set();
+    this.levelSeq++;
+    this._firstWordFoundInLevel = false;
 
     const randomLetter =
       RUSSIAN_ALPHABET[Math.floor(Math.random() * RUSSIAN_ALPHABET.length)];
@@ -374,7 +380,7 @@ class WordSearchGame {
     const lvlComplete = document.getElementById("levelCompleteMessage");
     if (lvlComplete) lvlComplete.style.display = "none";
 
-    trackLevelStart(this.currentLevel, this.themeLetter);
+    trackLevelStart(this.currentLevel, this.themeLetter, this.levelSeq);
   }
 
   rebuildPlacements(): void {
@@ -658,6 +664,10 @@ class WordSearchGame {
         this.rebuildPlacements();
       }
       this.foundWords.add(foundWord);
+      if (!this._firstWordFoundInLevel) {
+        this._firstWordFoundInLevel = true;
+        trackFirstWordFound(this.currentLevel);
+      }
       this.saveProgress();
       this.showMessage(`Найдено: ${foundWord}!`, "success");
       if (this.foundWords.size === this.words.length) {

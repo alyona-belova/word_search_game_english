@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # usage: python3 fetch_logs.py
-# output: reports/metrica-sessions-<date1>-<date2>.tsv
-# install: pip install tapi-yandex-metrika
 
 from tapi_yandex_metrika import YandexMetrikaLogsapi
 from datetime import date, timedelta
-import csv, sys, time, requests
+import ast, csv, sys, time, requests
 
 TOKEN   = ""
 COUNTER = ""
@@ -18,16 +16,94 @@ PARAMS = {
         "ym:s:visitID",
         "ym:s:date",
         "ym:s:clientID",
-        "ym:s:isNewUser",         # revisit rate
-        "ym:s:visitDuration",     # time on site
-        "ym:s:goalsID",           # which goals fired per session
-        "ym:s:parsedParamsKey1",  # game param keys   e.g. ab_group, level_status
-        "ym:s:parsedParamsKey2",  # game param values e.g. A, completed
+        "ym:s:isNewUser",           # new vs returning visitor
+        "ym:s:visitDuration",       # total session time (seconds)
+        "ym:s:pageViews",           # screens/pages seen in session
+        "ym:s:goalsID",             # which goals fired per session
+        "ym:s:deviceCategory",      # desktop / mobile / tablet
+        "ym:s:browser",             # Chrome, Safari, etc.
+        "ym:s:operatingSystem",     # iOS, Android, Windows, etc.
+        "ym:s:UTMSource",           # UTM source (e.g. google, vk, direct)
+        "ym:s:UTMMedium",           # UTM medium (e.g. cpc, organic, referral)
+        "ym:s:regionCity",          # city of the visitor
+        "ym:s:parsedParamsKey1",    # game event param keys
+        "ym:s:parsedParamsKey2",    # game event param values
     ]),
     "source": "visits",
     "date1": DATE1,
     "date2": DATE2,
 }
+
+# Fields that belong to a level attempt (reset after each level_status event)
+LEVEL_FIELDS = {"level", "theme_letter", "words_found", "words_total",
+                "completion_pct", "duration_sec", "hints_used",
+                "drop_off_pct", "level_status",
+                "level_seq",              # ordinal position of level in session
+                "time_to_first_word_sec"} # seconds from level load to first found word
+
+# Fields that are session-level and persist across level attempts
+SESSION_FIELDS = {"ab_group", "is_returning",
+                  "visit_count",   # cumulative visits by this user
+                  "hour_of_day"}   # local hour when session started (0–23)
+
+UNROLLED_COLUMNS = [
+    "session_id", "date", "client_id",
+    "is_new_user", "visit_duration_sec", "page_views",
+    "device_category", "browser", "os", "utm_source", "utm_medium", "region",
+    "ab_group", "is_returning", "visit_count", "hour_of_day",
+    "level", "theme_letter", "level_status", "level_seq",
+    "words_found", "words_total", "completion_pct",
+    "duration_sec", "hints_used", "drop_off_pct",
+    "time_to_first_word_sec",
+]
+
+
+def unroll_session(row):
+    """
+    Convert one session row from the Logs API into a list of dicts,
+    one dict per level attempt (each level_status event = one attempt).
+    Returns an empty list for sessions with no level events.
+    """
+    try:
+        keys = ast.literal_eval(row["ym:s:parsedParamsKey1"])
+        vals = ast.literal_eval(row["ym:s:parsedParamsKey2"])
+    except (ValueError, SyntaxError):
+        return []
+
+    base = {
+        "session_id":       row["ym:s:visitID"],
+        "date":             row["ym:s:date"],
+        "client_id":        row["ym:s:clientID"],
+        "is_new_user":      row["ym:s:isNewUser"],
+        "visit_duration_sec": row["ym:s:visitDuration"],
+        "page_views":       row.get("ym:s:pageViews", ""),
+        "device_category":  row.get("ym:s:deviceCategory", ""),
+        "browser":          row.get("ym:s:browser", ""),
+        "os":               row.get("ym:s:operatingSystem", ""),
+        "utm_source":       row.get("ym:s:UTMSource", ""),
+        "utm_medium":       row.get("ym:s:UTMMedium", ""),
+        "region":           row.get("ym:s:regionCity", ""),
+    }
+
+    attempts = []
+    ctx = {}  # accumulated key→value context within the current level attempt
+
+    for k, v in zip(keys, vals):
+        ctx[k] = v
+
+        if k == "level_status":
+            attempt = dict(base)
+            for field in (SESSION_FIELDS | LEVEL_FIELDS):
+                attempt[field] = ctx.get(field, "")
+            # Ensure level_status is set from current event (not stale ctx)
+            attempt["level_status"] = v
+            attempts.append(attempt)
+
+            # Reset level-specific context; keep session-level fields
+            for field in LEVEL_FIELDS:
+                ctx.pop(field, None)
+
+    return attempts
 
 client = YandexMetrikaLogsapi(
     access_token=TOKEN,
@@ -78,15 +154,23 @@ if len(lines_all) <= 1:
     sys.exit(0)
 
 header = lines_all[0].split("\t")
-rows = [dict(zip(header, l.split("\t"))) for l in lines_all[1:]]
+sessions = [dict(zip(header, l.split("\t"))) for l in lines_all[1:]]
+print(f"Fetched {len(sessions)} sessions.")
+
+all_attempts = []
+for session in sessions:
+    all_attempts.extend(unroll_session(session))
+
+print(f"Unrolled to {len(all_attempts)} level attempts.")
 
 out = f"reports/metrica-sessions-{DATE1}-{DATE2}.tsv"
 with open(out, "w", newline="", encoding="utf-8") as f:
-    writer = csv.DictWriter(f, fieldnames=header, delimiter="\t")
+    writer = csv.DictWriter(f, fieldnames=UNROLLED_COLUMNS,
+                            delimiter="\t", extrasaction="ignore")
     writer.writeheader()
-    writer.writerows(rows)
+    writer.writerows(all_attempts)
 
-print(f"Saved {len(rows)} sessions → {out}")
+print(f"Saved → {out}")
 
 client.clean(requestId=request_id).post()
 print("Log request cleaned.")

@@ -20,11 +20,28 @@ function setVisitParams(params: Record<string, unknown>): void {
 }
 
 const _sessionStart = Date.now();
+let _levelStart = 0;
 
 function trackSessionStart(abGroup: string): void {
   const isReturning = Boolean(localStorage.getItem("tutorialSeen"));
-  track("session_start", { is_returning: isReturning, ab_group: abGroup });
-  setVisitParams({ ab_group: abGroup, is_returning: isReturning ? 1 : 0 });
+
+  const visitCount = parseInt(localStorage.getItem("visitCount") ?? "0") + 1;
+  localStorage.setItem("visitCount", String(visitCount));
+
+  const hourOfDay = new Date().getHours();
+
+  track("session_start", {
+    is_returning: isReturning,
+    ab_group: abGroup,
+    visit_count: visitCount,
+    hour_of_day: hourOfDay,
+  });
+  setVisitParams({
+    ab_group: abGroup,
+    is_returning: isReturning ? 1 : 0,
+    visit_count: visitCount,
+    hour_of_day: hourOfDay,
+  });
 
   window.addEventListener("beforeunload", () => {
     const duration = Math.round((Date.now() - _sessionStart) / 1000);
@@ -32,9 +49,25 @@ function trackSessionStart(abGroup: string): void {
   });
 }
 
-function trackLevelStart(level: number, themeLetter: string): void {
-  track("level_started", { level, theme_letter: themeLetter });
-  setVisitParams({ level, level_status: "in_progress" });
+function trackLevelStart(
+  level: number,
+  themeLetter: string,
+  levelSeq: number,
+): void {
+  _levelStart = Date.now();
+  track("level_started", {
+    level,
+    theme_letter: themeLetter,
+    level_seq: levelSeq,
+  });
+  setVisitParams({ level, level_status: "in_progress", level_seq: levelSeq });
+}
+
+function trackFirstWordFound(level: number): void {
+  const timeSec =
+    _levelStart > 0 ? Math.round((Date.now() - _levelStart) / 1000) : 0;
+  track("first_word_found", { level, time_to_first_word_sec: timeSec });
+  setVisitParams({ time_to_first_word_sec: timeSec });
 }
 
 function trackLevelComplete(
