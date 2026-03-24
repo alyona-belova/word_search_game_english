@@ -23,10 +23,10 @@ const _sessionStart = Date.now();
 let _levelStart = 0;
 
 function trackSessionStart(abGroup: string): void {
-  const isReturning = Boolean(localStorage.getItem("tutorialSeen"));
+  const isReturning = Boolean(localStorage.getItem("tutorialSeenEng"));
 
-  const visitCount = parseInt(localStorage.getItem("visitCount") ?? "0") + 1;
-  localStorage.setItem("visitCount", String(visitCount));
+  const visitCount = parseInt(localStorage.getItem("visitCountEng") ?? "0") + 1;
+  localStorage.setItem("visitCountEng", String(visitCount));
 
   const hourOfDay = new Date().getHours();
 

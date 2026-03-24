@@ -85,7 +85,7 @@ function showTutorial(): void {
 function hideTutorial(): void {
   const modal = document.getElementById("tutorialModal");
   if (modal) modal.style.display = "none";
-  localStorage.setItem("tutorialSeen", "1");
+  localStorage.setItem("tutorialSeenEng", "1");
 }
 
 function setupTutorial(): void {
@@ -102,7 +102,7 @@ function setupTutorial(): void {
     });
   }
 
-  if (!localStorage.getItem("tutorialSeen")) {
+  if (!localStorage.getItem("tutorialSeenEng")) {
     showTutorial();
   }
 }
@@ -151,10 +151,10 @@ class WordSearchGame {
     this.wordPaths = new Map();
     this.hintCells = new Set();
 
-    this.abGroup = localStorage.getItem("abGroup") ?? "";
+    this.abGroup = localStorage.getItem("abGroupEng") ?? "";
     if (!this.abGroup) {
       this.abGroup = Math.random() < 0.5 ? "A" : "B";
-      localStorage.setItem("abGroup", this.abGroup);
+      localStorage.setItem("abGroupEng", this.abGroup);
     }
     this.levelSeq = 0;
     this._firstWordFoundInLevel = false;
@@ -201,14 +201,14 @@ class WordSearchGame {
         themeLetter: this.themeLetter,
         wordPaths: Array.from(this.wordPaths.entries()),
       };
-      localStorage.setItem("wordSearchProgress", JSON.stringify(progress));
+      localStorage.setItem("wordSearchProgressEng", JSON.stringify(progress));
     } catch (e) {
       console.error("Ошибка сохранения:", e);
     }
   }
 
   loadProgress(): boolean {
-    const saved = localStorage.getItem("wordSearchProgress");
+    const saved = localStorage.getItem("wordSearchProgressEng");
     if (!saved) return false;
     try {
       const progress = JSON.parse(saved) as GameProgress;
@@ -244,7 +244,7 @@ class WordSearchGame {
   }
 
   resetProgress(): void {
-    localStorage.removeItem("wordSearchProgress");
+    localStorage.removeItem("wordSearchProgressEng");
     this.currentLevel = 1;
     this.loadLevel();
   }

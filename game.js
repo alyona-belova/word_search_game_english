@@ -61,7 +61,7 @@ function hideTutorial() {
     const modal = document.getElementById("tutorialModal");
     if (modal)
         modal.style.display = "none";
-    localStorage.setItem("tutorialSeen", "1");
+    localStorage.setItem("tutorialSeenEng", "1");
 }
 function setupTutorial() {
     const closeBtn = document.getElementById("tutorialClose");
@@ -77,7 +77,7 @@ function setupTutorial() {
                 hideTutorial();
         });
     }
-    if (!localStorage.getItem("tutorialSeen")) {
+    if (!localStorage.getItem("tutorialSeenEng")) {
         showTutorial();
     }
 }
@@ -100,10 +100,10 @@ class WordSearchGame {
         this.extraWordsFoundCount = 0;
         this.wordPaths = new Map();
         this.hintCells = new Set();
-        this.abGroup = localStorage.getItem("abGroup") ?? "";
+        this.abGroup = localStorage.getItem("abGroupEng") ?? "";
         if (!this.abGroup) {
             this.abGroup = Math.random() < 0.5 ? "A" : "B";
-            localStorage.setItem("abGroup", this.abGroup);
+            localStorage.setItem("abGroupEng", this.abGroup);
         }
         this.levelSeq = 0;
         this._firstWordFoundInLevel = false;
@@ -142,14 +142,14 @@ class WordSearchGame {
                 themeLetter: this.themeLetter,
                 wordPaths: Array.from(this.wordPaths.entries()),
             };
-            localStorage.setItem("wordSearchProgress", JSON.stringify(progress));
+            localStorage.setItem("wordSearchProgressEng", JSON.stringify(progress));
         }
         catch (e) {
             console.error("Ошибка сохранения:", e);
         }
     }
     loadProgress() {
-        const saved = localStorage.getItem("wordSearchProgress");
+        const saved = localStorage.getItem("wordSearchProgressEng");
         if (!saved)
             return false;
         try {
@@ -184,7 +184,7 @@ class WordSearchGame {
         return false;
     }
     resetProgress() {
-        localStorage.removeItem("wordSearchProgress");
+        localStorage.removeItem("wordSearchProgressEng");
         this.currentLevel = 1;
         this.loadLevel();
     }
