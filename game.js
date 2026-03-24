@@ -533,7 +533,7 @@ class WordSearchGame {
                 trackFirstWordFound(this.currentLevel);
             }
             this.saveProgress();
-            this.showMessage(`Найдено: ${foundWord}!`, "success");
+            this.showMessage(`Found: ${foundWord}!`, "success");
             if (this.foundWords.size === this.words.length) {
                 this.levelComplete();
             }
