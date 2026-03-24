@@ -361,7 +361,7 @@ class WordSearchGame {
     this.selectedCells = [];
     this.placements.clear();
 
-    this.levelName = `Буква "${randomLetter}"`;
+    this.levelName = `Letter "${randomLetter}"`;
     this.updateThemeDisplay({ name: this.levelName });
     this.generateGrid();
     this.buildGrid();
