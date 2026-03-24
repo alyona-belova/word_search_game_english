@@ -12,7 +12,7 @@ You can play [here](https://alyona-belova.github.io/word_search_game_english/).
 - Words can twist and change direction. They are placed using a depth-first search (DFS) algorithm with a preference for straight-line movement
 - Finding 3 bonus words unlocks a hint that highlights one of the remaining words
 - Found words are displayed as colored SVG lines over the grid
-- The dictionary contains around 10,000 carefully selected words
+- The dictionary contains around 8,000 carefully selected words
 - Game state is saved to localStorage
 
 ## Technologies
