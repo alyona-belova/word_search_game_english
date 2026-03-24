@@ -5,34 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Зигзаг — игра в слова. Найди все спрятанные слова, петляющие по сетке из букв."
+      content="Zigzag — a word game. Find all the hidden words winding through the letter grid."
     />
     <meta
       name="keywords"
-      content="зигзаг, филворд, игра в слова, поиск слов, головоломка"
+      content="zigzag, word search, word game, find words, puzzle"
     />
     <meta name="robots" content="index, follow" />
-    <meta
-      name="google-site-verification"
-      content="GYx6_DAuvatEQXPwaPTeLCGrM90qHb__5pO9PDcsDCo"
-    />
     <link
       rel="canonical"
-      href="https://alyona-belova.github.io/word_search_game/"
+      href="https://alyona-belova.github.io/word_search_game_english/"
     />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Зигзаг — игра в слова" />
+    <meta property="og:title" content="Zigzag — a word game" />
     <meta
       property="og:description"
-      content="Найди все спрятанные слова, петляющие по сетке из букв."
+      content="Find all the hidden words winding through the letter grid."
     />
     <meta
       property="og:url"
-      content="https://alyona-belova.github.io/word_search_game/"
+      content="https://alyona-belova.github.io/word_search_game_english/"
     />
     <meta property="og:image" content="game_logo.png" />
-    <meta property="og:locale" content="ru_RU" />
-    <title>Зигзаг — найди все слова!</title>
+    <meta property="og:locale" content="en_US" />
+    <title>Zigzag — find all the words!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="style.css" />
@@ -62,7 +58,7 @@
         "https://mc.yandex.ru/metrika/tag.js",
         "ym",
       );
-      ym(107726491, "init", {
+      ym(108214863, "init", {
         clickmap: true,
         trackLinks: true,
         accurateTrackBounce: true,
@@ -71,7 +67,7 @@
     <noscript
       ><div>
         <img
-          src="https://mc.yandex.ru/watch/107726491"
+          src="https://mc.yandex.ru/watch/108214863"
           style="position: absolute; left: -9999px"
           alt=""
         /></div
@@ -81,9 +77,9 @@
     <div class="container">
       <div class="header">
         <div class="header-inner">
-          <h1>Зиг<span class="drop-accent">заг</span></h1>
+          <h1>Zig<span class="drop-accent">zag</span></h1>
           <div class="masthead-rule"></div>
-          <div class="masthead-tagline">Найди все спрятанные слова</div>
+          <div class="masthead-tagline">Find all the hidden words</div>
         </div>
       </div>
 
@@ -91,7 +87,7 @@
         <div class="current-theme">
           <div class="theme-badge" id="currentTheme">—</div>
         </div>
-        <div class="level-progress" id="levelProgress">Уровень: 1</div>
+        <div class="level-progress" id="levelProgress">Level: 1</div>
       </div>
 
       <div class="game-area">
@@ -101,7 +97,7 @@
 
         <div class="words-progress">
           <div class="progress-header">
-            <h3>Найдено слов</h3>
+            <h3>Words found</h3>
             <div class="progress-count" id="foundCount">0/0</div>
           </div>
           <div class="progress-bar">
@@ -112,7 +108,7 @@
             ></div>
           </div>
           <div class="hints-row">
-            <span class="hints-label">До подсказки</span>
+            <span class="hints-label">Hint progress</span>
             <div
               class="hint-progress-badge"
               id="hintProgressBadge"
@@ -124,11 +120,11 @@
             </div>
           </div>
           <div class="word-list-section" id="wordListSection">
-            <h3 class="word-list-header">Слова для поиска</h3>
+            <h3 class="word-list-header">Words to find</h3>
             <div id="wordList" class="word-list"></div>
           </div>
           <div class="words-found-container" id="foundWords">
-            <div class="empty-words">Пока ничего не найдено</div>
+            <div class="empty-words">Nothing found yet</div>
           </div>
         </div>
 
@@ -140,9 +136,9 @@
           style="display: none"
         >
           <div class="confetti"></div>
-          <p class="complete-title">Уровень пройден!</p>
+          <p class="complete-title">Level completed!</p>
           <button class="next-level-btn" id="nextLevelBtn">
-            <span>Следующий уровень</span>
+            <span>Next level</span>
             <svg
               width="20"
               height="20"
@@ -159,52 +155,47 @@
     </div>
     <div id="tutorialModal" class="modal-overlay" style="display: none">
       <div class="modal-card">
-        <h2 class="modal-title">Как играть?</h2>
+        <h2 class="modal-title">How to play?</h2>
         <div class="tutorial-steps">
           <div class="tutorial-step">
             <div class="step-icon">✍️</div>
             <div class="step-text">
-              <strong>Буква уровня</strong>
+              <strong>Level letter</strong>
               <p>
-                На каждом уровне задается новая буква, которую будут содержать
-                все слова для поиска. Она может быть в начале слова, в середине
-                или в конце.
+                Each level introduces a new letter that all search words must contain. It can be at the beginning, middle, or end of the word.
               </p>
             </div>
           </div>
           <div class="tutorial-step">
             <div class="step-icon">⚡</div>
             <div class="step-text">
-              <strong>Слова-зигзаги</strong>
+              <strong>Zigzag words</strong>
               <p>
-                Слова располагаются по ломаным линиям — каждая следующая буква
-                может быть в любой из 8 соседних клеток.
+                Words are arranged along broken lines — each subsequent letter can be in any of the 8 adjacent cells.
               </p>
             </div>
           </div>
           <div class="tutorial-step">
             <div class="step-icon">💡</div>
             <div class="step-text">
-              <strong>Подсказки</strong>
+              <strong>Hints</strong>
               <p>
-                Найди 3 слова не из текущего уровня, чтобы получить подсказку:
-                одно из нужных слов подсветится на поле.
+                Find 3 words not from the current level to get a hint: one of the required words will be highlighted on the grid.
               </p>
             </div>
           </div>
           <div class="tutorial-step">
             <div class="step-icon">🏆</div>
             <div class="step-text">
-              <strong>Цель</strong>
+              <strong>Goal</strong>
               <p>
-                Для прохождения уровня нужно найти все спрятанные слова. Чем
-                меньше подсказок, тем лучше :&#41;
+                To complete a level, you need to find all the hidden words. Try to use as few hints as possible!
               </p>
             </div>
           </div>
         </div>
         <button id="tutorialClose" class="tutorial-close-btn">
-          Начать играть!
+          Start playing!
         </button>
       </div>
     </div>

@@ -31,40 +31,33 @@ async function loadWordsFromFile(): Promise<string[]> {
 
 let allWords: string[] = [];
 
-const RUSSIAN_ALPHABET: string[] = [
-  "А",
-  "Б",
-  "В",
-  "Г",
-  "Д",
-  "Е",
-  "Ё",
-  "Ж",
-  "З",
-  "И",
-  "Й",
-  "К",
-  "Л",
-  "М",
-  "Н",
-  "О",
-  "П",
-  "Р",
-  "С",
-  "Т",
-  "У",
-  "Ф",
-  "Х",
-  "Ц",
-  "Ч",
-  "Ш",
-  "Щ",
-  "Ъ",
-  "Ы",
-  "Ь",
-  "Э",
-  "Ю",
-  "Я",
+const ENGLISH_ALPHABET: string[] = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
 ];
 
 const LINE_COLORS: string[] = [
@@ -325,7 +318,7 @@ class WordSearchGame {
     this._firstWordFoundInLevel = false;
 
     const randomLetter =
-      RUSSIAN_ALPHABET[Math.floor(Math.random() * RUSSIAN_ALPHABET.length)];
+      ENGLISH_ALPHABET[Math.floor(Math.random() * ENGLISH_ALPHABET.length)];
 
     const wordsWithLetter = allWords.filter(
       (word) =>
@@ -402,7 +395,7 @@ class WordSearchGame {
     const demoWord = this.words[randomIndex];
     this.foundWords.add(demoWord);
     this.showMessage(
-      `Слово "${demoWord}" уже найдено — попробуйте найти остальные!`,
+      `The word "${demoWord}" has already been found — try to find the rest!`,
       "level-complete",
     );
     this.saveProgress();
@@ -413,7 +406,7 @@ class WordSearchGame {
     const themeEl = document.getElementById("currentTheme");
     const levelEl = document.getElementById("levelProgress");
     if (themeEl) themeEl.textContent = theme.name;
-    if (levelEl) levelEl.textContent = `Уровень: ${this.currentLevel}`;
+    if (levelEl) levelEl.textContent = `Level: ${this.currentLevel}`;
   }
 
   generateGrid(): void {
@@ -565,7 +558,7 @@ class WordSearchGame {
   }
 
   fillEmptyCells(): void {
-    const fillAlphabet = RUSSIAN_ALPHABET.filter((l) => l !== this.themeLetter);
+    const fillAlphabet = ENGLISH_ALPHABET.filter((l) => l !== this.themeLetter);
     for (let i = 0; i < this.gridSize; i++) {
       for (let j = 0; j < this.gridSize; j++) {
         if (this.grid[i][j] === null) {
@@ -692,10 +685,10 @@ class WordSearchGame {
           this.saveProgress();
         } else {
           this.saveProgress();
-          this.showMessage("Слово из другого уровня!", "success");
+          this.showMessage("Word from another level!", "success");
         }
       } else {
-        this.showMessage("Данного слова нет в текущем словаре", "error");
+        this.showMessage("Word is not in the current dictionary", "error");
       }
     }
 
@@ -713,7 +706,7 @@ class WordSearchGame {
 
     path.forEach(([r, c]) => this.hintCells.add(`${r},${c}`));
     this.showMessage(
-      "Подсказка: одно из слов подсвечено на поле!",
+      "Hint: one of the words is highlighted on the grid!",
       "level-complete",
     );
     trackHintReceived(
@@ -726,13 +719,13 @@ class WordSearchGame {
   levelComplete(): void {
     let message = "";
     if (this.hintsUsed === 0) {
-      message = "Без подсказок. Идеально ✨";
+      message = "No hints used. Perfect! ✨";
     } else if (this.hintsUsed === 1) {
-      message = "Так держать! Всего одна подсказка";
+      message = "Nice work! Just one hint";
     } else if (this.hintsUsed === 2) {
-      message = "Две подсказки? Неплохо :)";
+      message = "Two hints? Still solid :)";
     } else {
-      message = "Сложный уровень? Не сдавайся!";
+      message = "Tough level? Keep going!";
     }
 
     const confettiDiv = document.querySelector(

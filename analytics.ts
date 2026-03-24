@@ -4,7 +4,7 @@ declare function ym(
   ...args: unknown[]
 ): void;
 
-const METRICA_COUNTER_ID = 107726491;
+const METRICA_COUNTER_ID = 108214863;
 
 function track(goal: string, params?: Record<string, unknown>): void {
   if (typeof ym === "undefined") return;

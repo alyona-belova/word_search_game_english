@@ -1,39 +1,38 @@
-# Зигзаг — игра в слова
+# Zigzag — a word game
 
-Головоломка по поиску слов. На каждом уровне нужно найти в сетке из букв спрятанные слова, содержащие определенную букву.
+A word search puzzle. On each level, you need to find hidden words containing a specific letter within a grid of letters.
 
-Поиграть можно [здесь](https://alyona-belova.github.io/word_search_game/).
+You can play [here](https://alyona-belova.github.io/word_search_game_english/).
 
-![Логотип игры](game_logo.png)
+![Game Logo](game_logo.png)
 
-## Особенности
+## Features
 
-- Каждый уровень случайно выбирает букву темы и подходящие слова
-- Слова могут изгибаться и менять направление. Они размещаются с помощью алгоритма обхода в глубину (DFS) с предпочтением прямого направления (для естественных изгибов)
-- Если найти 3 бонусных слова, то разблокируется подсказка, которая подсветит одно из оставшихся слов
-- Найденные слова отображаются в виде цветных SVG-линий поверх сетки
-- Словарь состоит из 10 000+ тщательно отобранных слов на русском языке
-- Состояние игры сохраняется в localStorage
+- Each level randomly selects a theme letter and matching words
+- Words can twist and change direction. They are placed using a depth-first search (DFS) algorithm with a preference for straight-line movement
+- Finding 3 bonus words unlocks a hint that highlights one of the remaining words
+- Found words are displayed as colored SVG lines over the grid
+- The dictionary contains around 10,000 carefully selected words
+- Game state is saved to localStorage
 
-## Технологии
+## Technologies
 
-| Слой | Технология |
+| Layer | Technology |
 |---|---|
-| Язык | TypeScript |
-| Рендеринг | Vanilla DOM + SVG overlays |
-| Стили | CSS с пользовательскими свойствами, clamp(), grid layout |
-| Хранилище | localStorage |
+| Language | TypeScript |
+| Rendering | Vanilla DOM + SVG overlays |
+| Styling | CSS with custom properties, clamp(), grid layout |
+| Storage | localStorage |
 
-## Начало работы
+## Getting Started
 
-**Требования:** Node.js (для компилятора TypeScript)
+**Requirements:** Node.js (for TypeScript compiler)
 ```bash
-# Установить зависимости
+# Install dependencies
 npm install
 
-# Запустить локально
+# Run locally
 npm run dev
 
-# Собрать для продакшена
+# Build for production
 npm run build
-```

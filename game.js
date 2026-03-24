@@ -14,40 +14,33 @@ async function loadWordsFromFile() {
     }
 }
 let allWords = [];
-const RUSSIAN_ALPHABET = [
-    "А",
-    "Б",
-    "В",
-    "Г",
-    "Д",
-    "Е",
-    "Ё",
-    "Ж",
-    "З",
-    "И",
-    "Й",
-    "К",
-    "Л",
-    "М",
-    "Н",
-    "О",
-    "П",
-    "Р",
-    "С",
-    "Т",
-    "У",
-    "Ф",
-    "Х",
-    "Ц",
-    "Ч",
-    "Ш",
-    "Щ",
-    "Ъ",
-    "Ы",
-    "Ь",
-    "Э",
-    "Ю",
-    "Я",
+const ENGLISH_ALPHABET = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
 ];
 const LINE_COLORS = [
     "rgba(193,97,74,0.82)",
@@ -251,7 +244,7 @@ class WordSearchGame {
         this.hintCells = new Set();
         this.levelSeq++;
         this._firstWordFoundInLevel = false;
-        const randomLetter = RUSSIAN_ALPHABET[Math.floor(Math.random() * RUSSIAN_ALPHABET.length)];
+        const randomLetter = ENGLISH_ALPHABET[Math.floor(Math.random() * ENGLISH_ALPHABET.length)];
         const wordsWithLetter = allWords.filter((word) => word.includes(randomLetter) &&
             word.length >= 4 &&
             word.length <= this.gridSize - 1);
@@ -308,7 +301,7 @@ class WordSearchGame {
         const randomIndex = Math.floor(Math.random() * this.words.length);
         const demoWord = this.words[randomIndex];
         this.foundWords.add(demoWord);
-        this.showMessage(`Слово "${demoWord}" уже найдено — попробуйте найти остальные!`, "level-complete");
+        this.showMessage(`The word "${demoWord}" has already been found — try to find the rest!`, "level-complete");
         this.saveProgress();
         this.render();
     }
@@ -318,7 +311,7 @@ class WordSearchGame {
         if (themeEl)
             themeEl.textContent = theme.name;
         if (levelEl)
-            levelEl.textContent = `Уровень: ${this.currentLevel}`;
+            levelEl.textContent = `Level: ${this.currentLevel}`;
     }
     generateGrid() {
         this.grid = Array.from({ length: this.gridSize }, () => Array(this.gridSize).fill(null));
@@ -446,7 +439,7 @@ class WordSearchGame {
         }
     }
     fillEmptyCells() {
-        const fillAlphabet = RUSSIAN_ALPHABET.filter((l) => l !== this.themeLetter);
+        const fillAlphabet = ENGLISH_ALPHABET.filter((l) => l !== this.themeLetter);
         for (let i = 0; i < this.gridSize; i++) {
             for (let j = 0; j < this.gridSize; j++) {
                 if (this.grid[i][j] === null) {
@@ -559,11 +552,11 @@ class WordSearchGame {
                 }
                 else {
                     this.saveProgress();
-                    this.showMessage("Слово из другого уровня!", "success");
+                    this.showMessage("Word from another level!", "success");
                 }
             }
             else {
-                this.showMessage("Данного слова нет в текущем словаре", "error");
+                this.showMessage("Word is not in the current dictionary", "error");
             }
         }
         this.selectedCells = [];
@@ -578,22 +571,22 @@ class WordSearchGame {
         if (!path || path.length === 0)
             return;
         path.forEach(([r, c]) => this.hintCells.add(`${r},${c}`));
-        this.showMessage("Подсказка: одно из слов подсвечено на поле!", "level-complete");
+        this.showMessage("Hint: one of the words is highlighted on the grid!", "level-complete");
         trackHintReceived(this.currentLevel, this.foundWords.size, this.words.length);
     }
     levelComplete() {
         let message = "";
         if (this.hintsUsed === 0) {
-            message = "Без подсказок. Идеально ✨";
+            message = "No hints used. Perfect! ✨";
         }
         else if (this.hintsUsed === 1) {
-            message = "Так держать! Всего одна подсказка";
+            message = "Nice work! Just one hint";
         }
         else if (this.hintsUsed === 2) {
-            message = "Две подсказки? Неплохо :)";
+            message = "Two hints? Still solid :)";
         }
         else {
-            message = "Сложный уровень? Не сдавайся!";
+            message = "Tough level? Keep going!";
         }
         const confettiDiv = document.querySelector("#levelCompleteMessage .confetti");
         if (confettiDiv)
