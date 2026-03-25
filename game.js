@@ -15,32 +15,32 @@ async function loadWordsFromFile() {
 }
 let allWords = [];
 const ENGLISH_ALPHABET = [
-  "A",
-  "B",
-  "C",
-  "D",
-  "E",
-  "F",
-  "G",
-  "H",
-  "I",
-  "J",
-  "K",
-  "L",
-  "M",
-  "N",
-  "O",
-  "P",
-  "Q",
-  "R",
-  "S",
-  "T",
-  "U",
-  "V",
-  "W",
-  "X",
-  "Y",
-  "Z",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
 ];
 const LINE_COLORS = [
     "rgba(193,97,74,0.82)",
@@ -301,7 +301,7 @@ class WordSearchGame {
         const randomIndex = Math.floor(Math.random() * this.words.length);
         const demoWord = this.words[randomIndex];
         this.foundWords.add(demoWord);
-        this.showMessage(`The word "${demoWord}" has already been found — try to find the rest!`, "level-complete");
+        this.showMessage(`We've found the word "${demoWord}" for you — find the rest!`, "level-complete");
         this.saveProgress();
         this.render();
     }
@@ -552,11 +552,11 @@ class WordSearchGame {
                 }
                 else {
                     this.saveProgress();
-                    this.showMessage("Word from another level!", "success");
+                    this.showMessage("That word is from another level!", "success");
                 }
             }
             else {
-                this.showMessage("Word is not in the current dictionary", "error");
+                this.showMessage("Not in the word list", "error");
             }
         }
         this.selectedCells = [];
@@ -746,7 +746,7 @@ class WordSearchGame {
         const foundArray = Array.from(this.foundWords);
         if (foundArray.length === 0) {
             container.innerHTML =
-                '<div class="empty-words">Пока ничего не найдено</div>';
+                '<div class="empty-words">Nothing found yet</div>';
             return;
         }
         container.innerHTML = foundArray
