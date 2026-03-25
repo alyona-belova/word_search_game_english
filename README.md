@@ -2,7 +2,7 @@
 
 A word search puzzle. On each level, you need to find hidden words containing a specific letter within a grid of letters.
 
-You can play [here](https://alyona-belova.github.io/word_search_game_english/).
+You can play [here](https://alyona-belova.github.io/word_search_game_english/)!
 
 ![Game Logo](game_logo.png)
 
