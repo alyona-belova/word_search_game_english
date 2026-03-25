@@ -151,10 +151,10 @@ class WordSearchGame {
     this.wordPaths = new Map();
     this.hintCells = new Set();
 
-    this.abGroup = localStorage.getItem("abGroupEng") ?? "";
+    this.abGroup = localStorage.getItem("abGroup") ?? "";
     if (!this.abGroup) {
       this.abGroup = Math.random() < 0.5 ? "A" : "B";
-      localStorage.setItem("abGroupEng", this.abGroup);
+      localStorage.setItem("abGroup", this.abGroup);
     }
     this.levelSeq = 0;
     this._firstWordFoundInLevel = false;
